@@ -3,16 +3,18 @@
 #include <string>
 #include <cstdlib>
 
+//单词类声明. 
 namespace WordsChecking{ 
     class Word
     {
         public:
-        char Word[50] = {'\0'};
-        char Meaning[50] = {'\0'};
+        char Word[35] = {'\0'};
+        char Meaning[35] = {'\0'};
         char Part_of_speech[10] = {'\0'};
     };
 }
 
+//单词表指针，用于单词测试. 
 WordsChecking::Word * WordTable;
 int MaxNum;
 
@@ -25,11 +27,14 @@ int Test(void);
 
 int main(void)
 {
-    switch(Menu())
+    while(1)
     {
-        case 1:WriteWordsFile();break;
-        case 2:PrepareTest();Test();break;
-        default:exit(0);
+        switch(Menu())
+        {
+            case 1:WriteWordsFile();break;
+            case 2:PrepareTest();Test();break;
+            default:exit(0);
+        }
     }
     system("pause");
 	return 0;
@@ -130,6 +135,8 @@ int Menu(void)
 int Test(void)
 {
     bool Tested[MaxNum] = {0};
+    int Displayed[4] = {-1,-1,-1,-1};
+    
     int RightAnswerIndex;
     int index;
     
@@ -145,12 +152,18 @@ int Test(void)
         
         for(int i = 1;i < 5;i++)
         {
+            int Fourofindex;
             if(RightAnswerIndex == i)
             {
                 std::cout << i << '.' << WordTable[index].Meaning << std::endl;
                 continue;
             }
-            std::cout << i << '.' << WordTable[rand()%MaxNum].Meaning << std::endl;
+            do{
+                Fourofindex = rand()%MaxNum;
+            }while(Fourofindex == RightAnswerIndex || Displayed[0] == Fourofindex ||Displayed[1] == Fourofindex ||Displayed[2] == Fourofindex ||Displayed[3] == Fourofindex);
+            Displayed[i-1] = Fourofindex;
+            
+            std::cout << i << '.' << WordTable[Fourofindex].Meaning << std::endl;
         }
         
         int Ch;
@@ -183,13 +196,15 @@ int Test(void)
             break;
         }
         
+        //复位 
+        Displayed[0] = -1;
+        Displayed[1] = -1;
+        Displayed[2] = -1;
+        Displayed[3] = -1;
+        
     }
     
     std::cout << "单词测试完成!" << std::endl;
     delete [] WordTable;
     return 0;
 }
-
-
-
-
