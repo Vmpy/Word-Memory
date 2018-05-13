@@ -138,7 +138,7 @@ int Test(void)
     int Displayed[4] = {-1,-1,-1,-1};
     
     int RightAnswerIndex;
-    int index;
+    int index;      //被测试的单词的在整个单词表单数据结构的下标. 
     
     while(true)
     {
@@ -147,7 +147,7 @@ int Test(void)
         }while(Tested[index] == true);
         
         system("cls");
-        std::cout << WordTable[index].Word << std::endl;
+        std::cout << "  "<< WordTable[index].Word << std::endl;
         RightAnswerIndex = 1+rand()%4;
         
         for(int i = 1;i < 5;i++)
@@ -155,28 +155,30 @@ int Test(void)
             int Fourofindex;
             if(RightAnswerIndex == i)
             {
-                std::cout << i << '.' << WordTable[index].Meaning << std::endl;
+                std::cout << ' ' << i << '.' << WordTable[index].Meaning << std::endl;
                 continue;
             }
             do{
                 Fourofindex = rand()%MaxNum;
-            }while(Fourofindex == RightAnswerIndex || Displayed[0] == Fourofindex ||Displayed[1] == Fourofindex ||Displayed[2] == Fourofindex ||Displayed[3] == Fourofindex);
+            }while(std::string(WordTable[Fourofindex].Word) == std::string(WordTable[index].Word) || Displayed[0] == Fourofindex ||Displayed[1] == Fourofindex ||Displayed[2] == Fourofindex ||Displayed[3] == Fourofindex);
             Displayed[i-1] = Fourofindex;
             
-            std::cout << i << '.' << WordTable[Fourofindex].Meaning << std::endl;
+            std::cout << ' ' << i << '.' << WordTable[Fourofindex].Meaning << std::endl;
         }
+        
+        std::cout << std::endl << "请输入您的选择:";
         
         int Ch;
         std::cin >> Ch;
         
         if(Ch == RightAnswerIndex)
         {
-            std::cout << "恭喜，单词意义正确!" << std::endl;
+            std::cout  << std::endl << "    恭喜，单词意义正确!" << std::endl;
             Tested[index] = true;
         }
         else
         {
-            std::cout << "啊哦，单词意义错误!" << std::endl;
+            std::cout  << std::endl << "    啊哦，单词意义错误!" << std::endl;
         }
         
         std::cin.get();
