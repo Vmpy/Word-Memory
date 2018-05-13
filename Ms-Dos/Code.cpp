@@ -4,7 +4,8 @@
 #include <cstdlib>
 
 //单词类声明. 
-namespace WordsChecking{ 
+namespace WordsChecking
+{ 
     class Word
     {
         public:
@@ -22,21 +23,28 @@ int Menu(void);
 int GetWordNum(const char*);
 int WriteWordsFile(void);
 int ReloadWordsFile(const char*,WordsChecking::Word*,int);
-int PrepareTest(void);
+int PrepareTest(bool,const char*);
 int Test(void);
 
-int main(void)
+int main(int argc,char** argv)
 {
-    while(1)
+    if(argc == 2)
     {
-        switch(Menu())
+        PrepareTest(true,*(argv+1));
+        Test();
+    }
+    else
+    {
+        while(1)
         {
-            case 1:WriteWordsFile();break;
-            case 2:PrepareTest();Test();break;
-            default:exit(0);
+            switch(Menu())
+            {
+                case 1:WriteWordsFile();break;
+                case 2:PrepareTest(false,0);Test();break;
+                default:exit(0);
+            }
         }
     }
-    system("pause");
 	return 0;
 }
 
@@ -99,15 +107,24 @@ int GetWordNum(const char* FileName)
     return Num;
 }
 
-int PrepareTest(void)
+int PrepareTest(bool iscmd,const char* CmdFileName)
 {
-    system("cls");
     std::string FileName;
-    std::cout << "请输入单词文件名:";
-    std::cout.flush();
-    std::cin >> FileName;
     std::ifstream File;
-    File.open(FileName.c_str(),std::ios_base::binary);
+    if(!iscmd)
+    {
+        system("cls");
+        std::cout << "请输入单词文件名:";
+        std::cout.flush();
+        std::cin >> FileName;
+        std::ifstream File;
+        File.open(FileName.c_str(),std::ios_base::binary);
+    }
+    else
+    {
+        File.open(CmdFileName,std::ios_base::binary);
+    }
+    
     while(!File.is_open())
     {
         std::cout << "不存在该文件，请检查输入再次输入:" << std::endl;
@@ -210,3 +227,4 @@ int Test(void)
     delete [] WordTable;
     return 0;
 }
+
