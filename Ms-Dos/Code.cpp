@@ -64,7 +64,7 @@ int WriteWordsFile(void)
         std::cout << "请给一个单词（如果输入是'ExIt'，则退出）：" << std::endl;
         std::cin.getline(TmpWord.Word,60);
         
-        if(std::string(TmpWord.Word) == "ExIt" && Count < 0)
+        if(std::string(TmpWord.Word) == "ExIt" && Count <= 0)
         {
             break;
         }
@@ -178,7 +178,7 @@ int Menu(void)
     std::cout << "*****************单词记忆程序*****************" << std::endl;
     std::cout << "               1.写入单词文件;" << std::endl;
     std::cout << "               2.选择文件测试;" << std::endl;
-    std::cout << "              [Others].退出程序." << std::endl;
+    std::cout << "            [其他任意键].退出程序." << std::endl;
     std::cin >> Ch;
     return Ch;
 }
@@ -202,17 +202,18 @@ int Test(void)
         
         system("cls");
         //显示: 
-        std::cout << "  "<< WordTable[index].Word  << "\t\t"<< '[' << WordTable[index].Part_of_speech << ']' << std::endl;
+        std::cout << "  "<< WordTable[index].Word  << "\t  "<< '[' << WordTable[index].Part_of_speech << ']' << std::endl;
         RightAnswerIndex = 1+rand()%4;
         
         for(int i = 1;i < 5;i++)
         {
-            int Fourofindex;
+            int Fourofindex;//四个选项的index变量 
             if(RightAnswerIndex == i)
             {
                 std::cout << ' ' << i << '.' << WordTable[index].Meaning << std::endl;
                 continue;
             }
+            
             do{
                 Fourofindex = rand()%MaxNum;
             }while(std::string(WordTable[Fourofindex].Word) == std::string(WordTable[index].Word) || Displayed[0] == Fourofindex ||Displayed[1] == Fourofindex ||Displayed[2] == Fourofindex ||Displayed[3] == Fourofindex);
@@ -262,8 +263,8 @@ int Test(void)
         Displayed[3] = -1;
         
     }
-    
-    std::cout << "单词测试完成!" << std::endl;
     delete [] WordTable;
+    WordTable = nullptr; 
+    std::cout << "单词测试完成!" << std::endl;
     return 0;
 }
