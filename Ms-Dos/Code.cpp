@@ -50,27 +50,57 @@ int main(int argc,char** argv)
 
 int WriteWordsFile(void)
 {
+    int Count = 4;
     std::string FileName;
     std::cout << "请提供一个文件名（未使用）：" << std::endl;
     std::cin >> FileName;
     std::cin.get();
     std::ofstream File;
     File.open(FileName.c_str(),std::ios_base::app | std::ios_base::binary);
+    std::cout << "请保证储存单词数目大于4." << std::endl;
     while(true)
     {
         WordsChecking::Word TmpWord;
-        std::cout << "请给一个单词（如果输入是'exit10'，则退出）：" << std::endl;
+        std::cout << "请给一个单词（如果输入是'ExIt'，则退出）：" << std::endl;
         std::cin.getline(TmpWord.Word,60);
-        if(std::string(TmpWord.Word) == "exit10")
+        
+        if(std::string(TmpWord.Word) == "ExIt" && Count < 0)
         {
             break;
         }
+        
+        if(std::string(TmpWord.Word) == "\0")
+        {
+            std::cout << "输入有误，请重新输入" << std::endl;
+            continue; 
+        }
+        
+        /**/
+        MEAN:
         std::cout << "请提供一个单词意义:" << std::endl;
         std::cin.getline(TmpWord.Meaning,60);
+        
+        if(std::string(TmpWord.Meaning) == "\0")
+        {
+            std::cout << "输入有误，请重新输入" << std::endl;
+            goto MEAN;
+        }
+        /**/
+        
+        /**/
+        SPCH:
         std::cout << "请提供单词的词性:" << std::endl;
+        
         std::cin.getline(TmpWord.Part_of_speech,10);
+        if(std::string(TmpWord.Part_of_speech) == "\0")
+        {
+            std::cout << "输入有误，请重新输入" << std::endl;
+            goto SPCH;
+        }
+        /**/
         
         File.write((char*)&TmpWord,sizeof(WordsChecking::Word));
+        Count--;
     }
     File.close();
     return 0;
@@ -107,6 +137,12 @@ int GetWordNum(const char* FileName)
     return Num;
 }
 
+/**
+*做测试前的准备工作，读取文件,装填数组等.
+*@Param iscmd:判断是否由控制台命令输入. 
+*@Param CmdFileName:控制台命令输入的文件名. 
+*/
+
 int PrepareTest(bool iscmd,const char* CmdFileName)
 {
     std::string FileName;
@@ -115,9 +151,7 @@ int PrepareTest(bool iscmd,const char* CmdFileName)
     {
         system("cls");
         std::cout << "请输入单词文件名:";
-        std::cout.flush();
         std::cin >> FileName;
-        std::ifstream File;
         File.open(FileName.c_str(),std::ios_base::binary);
     }
     else
@@ -149,6 +183,9 @@ int Menu(void)
     return Ch;
 }
 
+/**
+*开始测试函数体. 
+*/
 int Test(void)
 {
     bool Tested[MaxNum] = {0};
@@ -190,12 +227,12 @@ int Test(void)
         
         if(Ch == RightAnswerIndex)
         {
-            std::cout  << std::endl << "    恭喜，单词意义正确!" << std::endl;
+            std::cout  << std::endl << "    恭喜,选择正确!" << std::endl;
             Tested[index] = true;
         }
         else
         {
-            std::cout  << std::endl << "    啊哦，单词意义错误!" << std::endl;
+            std::cout  << std::endl << "    啊哦,选择错误!" << std::endl;
         }
         
         std::cin.get();
@@ -227,4 +264,3 @@ int Test(void)
     delete [] WordTable;
     return 0;
 }
-
