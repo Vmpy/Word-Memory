@@ -201,7 +201,8 @@ int Test(void)
         }while(Tested[index] == true);
         
         system("cls");
-        std::cout << "  "<< WordTable[index].Word << std::endl;
+        //显示: 
+        std::cout << "  "<< WordTable[index].Word  << "\t\t"<< '[' << WordTable[index].Part_of_speech << ']' << std::endl;
         RightAnswerIndex = 1+rand()%4;
         
         for(int i = 1;i < 5;i++)
@@ -233,6 +234,7 @@ int Test(void)
         else
         {
             std::cout  << std::endl << "    啊哦,选择错误!" << std::endl;
+            std::cout  << std::endl << "    正确意义: "  << WordTable[index].Meaning << std::endl;
         }
         
         std::cin.get();
@@ -247,6 +249,7 @@ int Test(void)
                 TrueNum++;
             }
         }
+        
         if (TrueNum == MaxNum)
         {
             break;
