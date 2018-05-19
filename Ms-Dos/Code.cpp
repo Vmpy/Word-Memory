@@ -188,6 +188,7 @@ int Menu(void)
 */
 int Test(void)
 {
+    int Checked = 0;
     bool Tested[MaxNum] = {0};
     int Displayed[4] = {-1,-1,-1,-1};
     
@@ -202,6 +203,7 @@ int Test(void)
         
         system("cls");
         //显示: 
+        std::cout << "  单词总数:" << MaxNum << "  剩余:" << (MaxNum-Checked) << std::endl; 
         std::cout << "  "<< WordTable[index].Word  << "\t  "<< '[' << WordTable[index].Part_of_speech << ']' << std::endl;
         RightAnswerIndex = 1+rand()%4;
         
@@ -231,6 +233,7 @@ int Test(void)
         {
             std::cout  << std::endl << "    恭喜,选择正确!" << std::endl;
             Tested[index] = true;
+            Checked++;
         }
         else
         {
