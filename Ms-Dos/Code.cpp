@@ -5,7 +5,7 @@
 
 //单词类声明. 
 namespace WordsChecking
-{ 
+{
     class Word
     {
         public:
@@ -156,6 +156,7 @@ int PrepareTest(bool iscmd,const char* CmdFileName)
     }
     else
     {
+        FileName = CmdFileName;
         File.open(CmdFileName,std::ios_base::binary);
     }
     
