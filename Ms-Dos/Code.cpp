@@ -25,6 +25,7 @@ int WriteWordsFile(void);
 int ReloadWordsFile(const char*,WordsChecking::Word*,int);
 int PrepareTest(bool,const char*);
 int Test(void);
+int DisplayWords(int);
 
 int main(int argc,char** argv)
 {
@@ -41,6 +42,7 @@ int main(int argc,char** argv)
             {
                 case 1:WriteWordsFile();break;
                 case 2:PrepareTest(false,0);Test();break;
+                case 3:PrepareTest(false,0);DisplayWords(MaxNum);break;
                 default:exit(0);
             }
         }
@@ -179,6 +181,7 @@ int Menu(void)
     std::cout << "*****************单词记忆程序*****************" << std::endl;
     std::cout << "               1.写入单词文件;" << std::endl;
     std::cout << "               2.选择文件测试;" << std::endl;
+    std::cout << "               3.选择文件显示;" << std::endl;
     std::cout << "            [其他任意键].退出程序." << std::endl;
     std::cin >> Ch;
     return Ch;
@@ -270,5 +273,27 @@ int Test(void)
     delete [] WordTable;
     WordTable = nullptr; 
     std::cout << "单词测试完成!" << std::endl;
+    return 0;
+}
+
+int DisplayWords(int Max)
+{
+    system("cls");
+    std::cout.flags(std::ios::left); //左对齐
+    for(int i = 0;i < Max;i++)
+    {
+        std::cout << "单词:";
+        std::cout.width(15);
+        std::cout << WordTable[i].Word;
+        std::cout << '[';
+        std::cout << WordTable[i].Part_of_speech;
+        std::cout.width(10);
+        std::cout << ']';
+        std::cout << "意义:";
+        std::cout.width(15);
+        std::cout << WordTable[i].Meaning << std::endl; 
+    }
+    delete [] WordTable;
+    WordTable = nullptr;
     return 0;
 }
