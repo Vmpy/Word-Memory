@@ -2,18 +2,7 @@
 #include <fstream>
 #include <string>
 #include <cstdlib>
-
-//单词类声明. 
-namespace WordsChecking
-{
-    class Word
-    {
-        public:
-        char Word[35] = {'\0'};
-        char Meaning[35] = {'\0'};
-        char Part_of_speech[10] = {'\0'};
-    };
-}
+#include "Data.h"
 
 //单词表指针，用于单词测试. 
 WordsChecking::Word * WordTable;
@@ -26,6 +15,8 @@ int ReloadWordsFile(const char*,WordsChecking::Word*,int);
 int PrepareTest(bool,const char*);
 int Test(void);
 int DisplayWords(int);
+int RewriteFile(int);
+
 
 int main(int argc,char** argv)
 {
@@ -235,13 +226,13 @@ int Test(void)
         
         if(Ch == RightAnswerIndex)
         {
-            std::cout  << std::endl << "    恭喜,选择正确!" << std::endl;
+            std::cout  << std::endl << "    选择正确!" << std::endl;
             Tested[index] = true;
             Checked++;
         }
         else
         {
-            std::cout  << std::endl << "    啊哦,选择错误!" << std::endl;
+            std::cout  << std::endl << "    选择错误!" << std::endl;
             std::cout  << std::endl << "    正确意义: "  << WordTable[index].Meaning << std::endl;
         }
         
