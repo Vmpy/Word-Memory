@@ -1,11 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <cstdlib>
 #include "Data.h"
 
 //单词表指针，用于单词测试. 
 WordsChecking::Word * WordTable;
+char WorkFileName[50];
 int MaxNum;
 
 int Menu(void);
@@ -16,6 +18,7 @@ int PrepareTest(bool,const char*);
 int Test(void);
 int DisplayWords(int);
 int RewriteFile(int);
+int DeleteLemma(const int);
 
 
 int main(int argc,char** argv)
@@ -33,7 +36,8 @@ int main(int argc,char** argv)
             {
                 case 1:WriteWordsFile();break;
                 case 2:PrepareTest(false,0);Test();break;
-                case 3:PrepareTest(false,0);DisplayWords(MaxNum);break;
+                case 3:PrepareTest(false,0);DisplayWords(MaxNum);delete [] WordTable;WordTable = nullptr;break;
+                case 4:PrepareTest(false,0);DeleteLemma(GetWordNum(WorkFileName));break;
                 default:exit(0);
             }
         }
@@ -96,6 +100,7 @@ int WriteWordsFile(void)
         Count--;
     }
     File.close();
+    strcpy(WorkFileName,FileName.c_str());
     return 0;
 }
 
@@ -163,6 +168,7 @@ int PrepareTest(bool iscmd,const char* CmdFileName)
     MaxNum = GetWordNum(FileName.c_str());
     WordTable = new WordsChecking::Word[MaxNum];
     ReloadWordsFile(FileName.c_str(),WordTable,MaxNum);
+    strcpy(WorkFileName,FileName.c_str());
     return 0;
 }
 
@@ -173,6 +179,7 @@ int Menu(void)
     std::cout << "               1.写入单词文件;" << std::endl;
     std::cout << "               2.选择文件测试;" << std::endl;
     std::cout << "               3.选择文件显示;" << std::endl;
+    std::cout << "               4.删除单词词条;" << std::endl;
     std::cout << "            [其他任意键].退出程序." << std::endl;
     std::cin >> Ch;
     return Ch;
@@ -273,7 +280,7 @@ int DisplayWords(int Max)
     std::cout.flags(std::ios::left); //左对齐
     for(int i = 0;i < Max;i++)
     {
-        std::cout << "单词:";
+        std::cout <<  i << ".单词:";
         std::cout.width(15);
         std::cout << WordTable[i].Word;
         std::cout << '[';
@@ -284,6 +291,53 @@ int DisplayWords(int Max)
         std::cout.width(15);
         std::cout << WordTable[i].Meaning << std::endl; 
     }
+    return 0;
+}
+
+int DeleteLemma(const int Max)
+{
+    if(Max == 0)
+    {
+        std::cout << "Error!Cannot open empty file!";
+        return 0;
+    }
+    
+    int OrderNum = -1;  //词条序号 
+    bool Mark[Max] = {0};   //表示被标记（被删除）的词条 
+    char Yes;       //是否继续条件测试 
+    DisplayWords(Max);  //显示词表 
+    
+    while(true)
+    {
+        do
+        {
+            std::cout << "请输入即将删除的词条序号:";
+            std::cin >> OrderNum;
+        }while(OrderNum < 0 && OrderNum > Max);
+        
+        Mark[OrderNum] = true;  //标记为true 
+
+        std::cout << "是否继续,Y键继续[其他任意键退出]:" << std::flush;
+        std::cin >> Yes;
+        if(!(Yes == 'Y' || Yes == 'y'))
+        {
+            break;
+        }
+    }
+    
+    std::ofstream FileReWrite;
+    FileReWrite.open(WorkFileName);
+    
+    for(int i = 0;i < Max;i++)
+    {
+        if(!Mark[i])    //没有被标记的词条重新写入. 
+        {
+            FileReWrite.write((char*)&WordTable[i],sizeof(WordsChecking::Word));
+        }
+    }
+    FileReWrite.close();
+    std::cout << "单词词条删除完成." << std::endl;
+    //照例清空内存 
     delete [] WordTable;
     WordTable = nullptr;
     return 0;
