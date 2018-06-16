@@ -11,6 +11,25 @@ namespace WordsChecking
         char Part_of_speech[10];
     };
     
+    class WriteWindowData
+    {
+        public:
+        HWND Word;
+        const int WordId = 2001;
+        HWND Meaning;
+        const int MeaningId = 2002;
+        HWND Part_of_speech; 
+        const int Part_of_speechId = 2003;
+        HWND WordIn;
+        const int WordInId = 1;
+        HWND MeaningIn;
+        const int MeaningInId = 2;
+        HWND SpeechIn;
+        const int SpeechInId = 3;
+        HWND OK;
+        const int OKId = 1111;
+    };
+    
     class WorkWindowData
     {
         public:
@@ -24,8 +43,11 @@ namespace WordsChecking
         unsigned int WordTextPosy = 0;
         
         HWND BlockOne_WriteFile;
-        const int BlockOneId = 1; 
+        const int BlockOneId = 1001; 
         HWND BlockTwo_CheckWords;
-        const int BlockTwoId = 2;
+        const int BlockTwoId = 1002;
+        
+        WriteWindowData WriteWindow;
+        TEXTMETRIC TextData; 
     };
 }
