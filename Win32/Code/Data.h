@@ -22,5 +22,10 @@ namespace WordsChecking
         HWND WordText = 0;
         unsigned int WordTextPosx = 0;
         unsigned int WordTextPosy = 0;
+        
+        HWND BlockOne_WriteFile;
+        const int BlockOneId = 1; 
+        HWND BlockTwo_CheckWords;
+        const int BlockTwoId = 2;
     };
 }
