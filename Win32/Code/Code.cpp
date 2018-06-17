@@ -73,12 +73,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                 WinData.WindowWidth = GET_X_LPARAM(lParam);
                 WinData.WindowHeight = GET_Y_LPARAM(lParam);
                 
-                WinData.BlockOne_WriteFile = CreateWindowEx(0,"STATIC",TEXT("写入文件"),SS_NOTIFY|WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,0,WinData.WindowWidth,WinData.WindowHeight/2,WinData.Window,(HMENU)WinData.BlockOneId,0,0);
-                WinData.BlockTwo_CheckWords = CreateWindowEx(0,"STATIC",TEXT("单词记忆"),SS_NOTIFY|WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,1*(WinData.WindowHeight/2),WinData.WindowWidth,WinData.WindowHeight/2,WinData.Window,(HMENU)WinData.BlockTwoId,0,0);
-                
-                hdc = GetDC(hwnd);
-                GetTextMetrics(hdc,&(WinData.TextData));
-                ReleaseDC(hwnd,hdc);
+                WinData.MainMenu();
             }
             break;
         }
@@ -147,6 +142,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                     GetSaveFileName(&ofn);
                     
                     rename("SomeTempFile.tmp",FileName);
+                    SetWindowText(WinData.Window,"单词记忆");
+                    //设置标志位，返回主菜单. 
+                    IsMenuDisplay = true;
+                    //摧毁输入控件 
+                    WinData.WriteWindow.DestoryWindows();
+                    WinData.MainMenu();
                 }
             }
             break;
@@ -166,14 +167,16 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
 
 void WriteFile(void)
 {
-
+    //设置窗口标题 
+    SetWindowText(WinData.Window,"单词录入"); 
     WinData.WriteWindow.WordIn = CreateWindowEx(0,"STATIC","单词:",WS_VISIBLE|WS_CHILD|SS_LEFT,0,0,WinData.TextData.tmAveCharWidth*6,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.WordInId,0,0);
     WinData.WriteWindow.MeaningIn = CreateWindowEx(0,"STATIC","单词意义:",WS_VISIBLE|WS_CHILD|SS_LEFT,0,(WinData.TextData.tmHeight+5)*1,WinData.TextData.tmAveCharWidth*10,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.MeaningInId,0,0);
     WinData.WriteWindow.SpeechIn = CreateWindowEx(0,"STATIC","单词词性:",WS_VISIBLE|WS_CHILD|SS_LEFT,0,(WinData.TextData.tmHeight+5)*2,WinData.TextData.tmAveCharWidth*10,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.SpeechInId,0,0);
+    //隐藏主菜单 
     IsMenuDisplay = false;
     WinData.WriteWindow.Word = CreateWindowEx(0,"EDIT","",WS_VISIBLE|WS_CHILD|WS_BORDER|ES_MULTILINE|ES_LEFT,WinData.TextData.tmAveCharWidth*6,0,WinData.TextData.tmAveCharWidth*20,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.WordId,0,0);
     WinData.WriteWindow.Meaning = CreateWindowEx(0,"EDIT","",WS_VISIBLE|WS_CHILD|WS_BORDER|ES_MULTILINE|ES_LEFT,WinData.TextData.tmAveCharWidth*10,(WinData.TextData.tmHeight+5)*1,WinData.TextData.tmAveCharWidth*20,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.MeaningId,0,0);
     WinData.WriteWindow.Part_of_speech = CreateWindowEx(0,"EDIT","",WS_VISIBLE|WS_CHILD|WS_BORDER|ES_MULTILINE|ES_LEFT,WinData.TextData.tmAveCharWidth*10,(WinData.TextData.tmHeight+5)*2,WinData.TextData.tmAveCharWidth*20,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.Part_of_speechId,0,0);
     WinData.WriteWindow.OK = CreateWindowEx(0,"BUTTON","录入",WS_VISIBLE|WS_CHILD|BS_PUSHBUTTON,50,(WinData.TextData.tmHeight+5)*3,WinData.TextData.tmAveCharWidth*7,WinData.TextData.tmHeight+8,WinData.Window,(HMENU)WinData.WriteWindow.OKId,0,0);
-    return;
+    MoveWindow(WinData.Window,680,240,WinData.TextData.tmAveCharWidth*45,(WinData.TextData.tmHeight)*12,true);
 }
