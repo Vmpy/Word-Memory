@@ -28,6 +28,16 @@ namespace WordsChecking
         const int SpeechInId = 3;
         HWND OK;
         const int OKId = 1111;
+        void DestoryWindows(void)
+        {
+            DestroyWindow(Meaning);
+            DestroyWindow(MeaningIn);
+            DestroyWindow(OK);
+            DestroyWindow(Part_of_speech);
+            DestroyWindow(SpeechIn);
+            DestroyWindow(Word);
+            DestroyWindow(WordIn);
+        }
     };
     
     class WorkWindowData
@@ -49,5 +59,14 @@ namespace WordsChecking
         
         WriteWindowData WriteWindow;
         TEXTMETRIC TextData; 
+        void MainMenu(void)
+        {
+            HDC hdc;
+            hdc = GetDC(Window);
+            GetTextMetrics(hdc,&(TextData));
+            ReleaseDC(Window,hdc);
+            BlockOne_WriteFile = CreateWindowEx(0,"STATIC",TEXT("写入文件"),SS_NOTIFY|WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,0,WindowWidth,WindowHeight/2,Window,(HMENU)BlockOneId,0,0);
+            BlockTwo_CheckWords = CreateWindowEx(0,"STATIC",TEXT("单词记忆"),SS_NOTIFY|WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,1*(WindowHeight/2),WindowWidth,WindowHeight/2,Window,(HMENU)BlockTwoId,0,0);     
+        }
     };
 }
