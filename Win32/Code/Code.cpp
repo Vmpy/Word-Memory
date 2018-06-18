@@ -64,14 +64,8 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 
 LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
 {
-    static HDC hdc;
-    
 	switch(Message)
     {
-        case WM_CREATE:
-        {
-            break; 
-        }
         case WM_SIZE:
         {
             if(IsMenuDisplay)
@@ -132,12 +126,18 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
             {
                 DestroyWindow(WinData.BlockOne_WriteFile);
                 DestroyWindow(WinData.BlockTwo_CheckWords);
+                HDC hdc = GetDC(WinData.BlockOne_WriteFile);
+                SetTextColor(hdc,RGB(255,255,255));
+                ReleaseDC(WinData.BlockOne_WriteFile,hdc); 
                 WriteFile();
             }
             else if((HWND)lParam == WinData.BlockTwo_CheckWords && HIWORD(wParam) == STN_CLICKED)
             {
                 DestroyWindow(WinData.BlockOne_WriteFile);
                 DestroyWindow(WinData.BlockTwo_CheckWords);
+                HDC hdc = GetDC(WinData.BlockTwo_CheckWords);
+                SetTextColor(hdc,RGB(255,255,255));
+                ReleaseDC(WinData.BlockOne_WriteFile,hdc);
                 PrepareWords();
                 CheckWords();
             }
@@ -181,7 +181,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                     IsMenuDisplay = true;
                     //摧毁输入控件 
                     WinData.WriteWindow.DestoryWindows();
-                    WinData.MainMenu();
+                    WinData.MainMenu(); //再次显示菜单. 
                 }
             }
             //TODO:点击ChoiceOK按钮后的事件. 
@@ -304,7 +304,7 @@ void CheckWords(void)
     
     *(WinData.CheckWindow.Tested+index) = true; 
     SetWindowText(WinData.CheckWindow.Word,WinData.CheckWindow.WordTable[index].Word);
-    MoveWindow(WinData.CheckWindow.Word,WinData.WindowWidth/2-(WinData.TextData.tmAveCharWidth*lstrlen(WinData.CheckWindow.WordTable[index].Word)/2),0,WinData.TextData.tmAveCharWidth*(2+lstrlen(WinData.CheckWindow.WordTable[index].Word)),WinData.TextData.tmHeight+15,true);
+    MoveWindow(WinData.CheckWindow.Word,WinData.WindowWidth/2-(WinData.TextData.tmAveCharWidth*lstrlen(WinData.CheckWindow.WordTable[index].Word)/2),WinData.TextData.tmHeight,WinData.TextData.tmAveCharWidth*(2+lstrlen(WinData.CheckWindow.WordTable[index].Word)),WinData.TextData.tmHeight+15,true);
     
     int RightAnswerIndex = 1+rand()%4;
         
@@ -338,7 +338,7 @@ void CheckWords(void)
         }
         MoveWindow(Tmp,0,i*(WinData.TextData.tmHeight/2),2*lstrlen(WinData.CheckWindow.WordTable[Fourofindex].Meaning)*(WinData.TextData.tmAveCharWidth/2),WinData.TextData.tmHeight/2,true);   
     }
-    MoveWindow(WinData.CheckWindow.ChoiceOK,0,WinData.WindowHeight-WinData.TextData.tmHeight*4/2,WinData.WindowWidth,WinData.TextData.tmHeight,true);
+    MoveWindow(WinData.CheckWindow.ChoiceOK,0,WinData.WindowHeight-WinData.TextData.tmHeight*4/2,WinData.WindowWidth,WinData.TextData.tmHeight+20,true);
     MoveWindow(WinData.CheckWindow.Choice,0,WinData.WindowHeight/2,WinData.WindowWidth,4*(WinData.TextData.tmHeight/1.5),true);
     return;
 }
