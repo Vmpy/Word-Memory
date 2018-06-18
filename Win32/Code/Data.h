@@ -14,19 +14,19 @@ namespace WordsChecking
     class WriteWindowData
     {
         public:
-        HWND Word;
+        HWND Word = 0;
         const int WordId = 2001;
-        HWND Meaning;
+        HWND Meaning = 0;
         const int MeaningId = 2002;
-        HWND Part_of_speech; 
+        HWND Part_of_speech = 0; 
         const int Part_of_speechId = 2003;
-        HWND WordIn;
+        HWND WordIn = 0;
         const int WordInId = 1;
-        HWND MeaningIn;
+        HWND MeaningIn = 0;
         const int MeaningInId = 2;
-        HWND SpeechIn;
+        HWND SpeechIn = 0;
         const int SpeechInId = 3;
-        HWND OK;
+        HWND OK = 0;
         const int OKId = 1111;
         
         void DestoryWindows(void)
@@ -44,8 +44,8 @@ namespace WordsChecking
     class CheckWordsData
     {
         public:
-        int MaxNum;
-        Word* WordTable;
+        int MaxNum = 0;
+        Word* WordTable = 0;
         bool* Tested = 0;
         int Displayed[4] = {-1,-1,-1,-1};
         //Group Button
@@ -114,17 +114,20 @@ namespace WordsChecking
         HFONT ShFont = CreateFont(22,8,0,0,400,FALSE, FALSE, FALSE,DEFAULT_CHARSET,OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, DEFAULT_QUALITY,FF_DONTCARE, TEXT("微软雅黑"));
         void MainMenu(void)
         {
-            HDC hdc;
-            hdc = GetDC(Window);
-            GetTextMetrics(hdc,&(TextData));
-            TextData.tmHeight = 44;
-            TextData.tmAveCharWidth = 16;
-            ReleaseDC(Window,hdc);
-            
-            BlockOne_WriteFile = CreateWindowEx(0,"STATIC",TEXT("写入文件"),SS_NOTIFY|WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,0,WindowWidth,WindowHeight/2,Window,(HMENU)BlockOneId,0,0);
-            BlockTwo_CheckWords = CreateWindowEx(0,"STATIC",TEXT("单词记忆"),SS_NOTIFY|WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,1*(WindowHeight/2),WindowWidth,WindowHeight/2,Window,(HMENU)BlockTwoId,0,0);
-            SendMessage(BlockOne_WriteFile,WM_SETFONT,(WPARAM)hFont,0);
-            SendMessage(BlockTwo_CheckWords,WM_SETFONT,(WPARAM)hFont,0);     
+            if(!BlockOne_WriteFile && !BlockTwo_CheckWords)
+            {
+                HDC hdc;
+                hdc = GetDC(Window);
+                GetTextMetrics(hdc,&(TextData));
+                TextData.tmHeight = 44;
+                TextData.tmAveCharWidth = 16;
+                ReleaseDC(Window,hdc);
+                
+                BlockOne_WriteFile = CreateWindowEx(0,"STATIC",TEXT("写入文件"),SS_NOTIFY|WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,0,WindowWidth,WindowHeight/2,Window,(HMENU)BlockOneId,0,0);
+                BlockTwo_CheckWords = CreateWindowEx(0,"STATIC",TEXT("单词记忆"),SS_NOTIFY|WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,1*(WindowHeight/2),WindowWidth,WindowHeight/2,Window,(HMENU)BlockTwoId,0,0);
+                SendMessage(BlockOne_WriteFile,WM_SETFONT,(WPARAM)hFont,0);
+                SendMessage(BlockTwo_CheckWords,WM_SETFONT,(WPARAM)hFont,0);     
+            }
         }
     };
 }
