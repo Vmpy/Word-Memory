@@ -1,159 +1,375 @@
 #include <windows.h>
+#include <windowsx.h> 
+#include <fstream>
+#include <cstdio>
+#include <ctime> 
+#include "Data.h" 
 
-//单词类声明. 
-namespace WordsChecking
+
+WordsChecking::WorkWindowData WinData;
+
+bool IsMenuDisplay = true;
+
+LRESULT CALLBACK WndProc(HWND,UINT,WPARAM,LPARAM);
+
+void WriteFile(void);
+void CheckWords(void);
+
+int ReloadWordsFile(const char*,WordsChecking::Word*,int);
+void PrepareWords(void); 
+ 
+int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow)
 {
-    class Word
+	WNDCLASSEX wc;
+	MSG msg;
+
+	memset(&wc,0,sizeof(wc));
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.lpfnWndProc = WndProc;
+	wc.hInstance = hInstance;
+	wc.hCursor = LoadCursor(NULL,IDC_ARROW);
+	
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wc.lpszClassName = "WordMemory";
+	wc.hIcon = LoadIcon(NULL,IDI_APPLICATION);
+	wc.hIconSm = LoadIcon(NULL,IDI_APPLICATION);
+
+	if(!RegisterClassEx(&wc))
     {
-        public:
-        char Word[35];
-        char Meaning[35];
-        char Part_of_speech[10];
-    };
-    
-    class WriteWindowData
+		MessageBox(NULL, "Window Registration Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
+		return 0;
+	}
+
+	WinData.Window = CreateWindowEx(WS_EX_CLIENTEDGE,"WordMemory",WinData.Caption,WS_VISIBLE|WS_OVERLAPPEDWINDOW^WS_THICKFRAME^WS_MAXIMIZEBOX,
+        CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		640,
+		480,
+		NULL,NULL,hInstance,NULL);
+
+	if(WinData.Window == NULL)
     {
-        public:
-        HWND Word = 0;
-        const int WordId = 2001;
-        HWND Meaning = 0;
-        const int MeaningId = 2002;
-        HWND Part_of_speech = 0; 
-        const int Part_of_speechId = 2003;
-        HWND WordIn = 0;
-        const int WordInId = 1;
-        HWND MeaningIn = 0;
-        const int MeaningInId = 2;
-        HWND SpeechIn = 0;
-        const int SpeechInId = 3;
-        HWND OK = 0;
-        const int OKId = 1111;
-        
-        void DestoryWindows(void)
+		MessageBox(NULL,"Window Creation Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
+		return 0;
+	}
+
+	while(GetMessage(&msg,NULL,0,0))
+    {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	return msg.wParam;
+}
+
+LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
+{
+	switch(Message)
+    {
+        case WM_SIZE:
         {
-            DestroyWindow(Meaning);
-            DestroyWindow(MeaningIn);
-            DestroyWindow(OK);
-            DestroyWindow(Part_of_speech);
-            DestroyWindow(SpeechIn);
-            DestroyWindow(Word);
-            DestroyWindow(WordIn);
-        }
-    };
-    
-    class CheckWordsData
-    {
-        public:
-        int MaxNum = 0;
-        Word* WordTable = 0;
-        bool* Tested = 0;
-        int Displayed[4] = {-1,-1,-1,-1};
-        //Group Button
-        HWND Choice;
-        const int ChoiceId = 3000;
-        //Radio Buttons
-        HWND ChoiceA;
-        const int ChoiceAId = 3001;
-        HWND ChoiceB;
-        const int ChoiceBId = 3002;
-        HWND ChoiceC;
-        const int ChoiceCId = 3003;
-        HWND ChoiceD;
-        const int ChoiceDId = 3004;
-        
-        HWND ChoiceOK;
-        const int ChoiceOKId = 3005;
-        //Static 
-        HWND Word;
-        const int WordId = 3005;
-        
-        int NowIndex = 0; 
-        
-        int GetWordNum(const char* FileName)
-        {
-            int Num = 0;
-            std::ifstream File;
-            File.open(FileName,std::ios_base::binary);
-            while(true)
+            if(IsMenuDisplay)
             {
-                WordsChecking::Word User;
-                File.read((char*)&User,sizeof(WordsChecking::Word));
-                if(File.eof())
-                {
-                    break;
-                }
-                Num++;
-            }
-            File.close();
-            return Num;
-        }
-        
-        void DestroyWindows(void)
-        {
-            DestroyWindow(Choice);
-            DestroyWindow(ChoiceA);
-            DestroyWindow(ChoiceB);
-            DestroyWindow(ChoiceC);
-            DestroyWindow(ChoiceD);
-            DestroyWindow(ChoiceOK);
-            DestroyWindow(Word);
-        }
-        
-        bool IsDone(void)
-        {
-            int Count = 0;
-            for(int i = 0;i < MaxNum;i++)
-            {
-                if(Tested[i] != true)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }; 
-    
-    class WorkWindowData
-    {
-        public:
-        
-        HWND Window = 0;
-        unsigned int WindowHeight = 0;
-        unsigned int WindowWidth = 0;
-        char Caption[15] = "单词记忆";
-        
-        HWND WordText = 0;
-        unsigned int WordTextPosx = 0;
-        unsigned int WordTextPosy = 0;
-        
-        HWND BlockOne_WriteFile;
-        const int BlockOneId = 1001; 
-        HWND BlockTwo_CheckWords;
-        const int BlockTwoId = 1002;
-        
-        WriteWindowData WriteWindow;
-        CheckWordsData CheckWindow;
-        
-        TEXTMETRIC TextData;
-        //这里的小字体=大字体长宽/2，所以在代码中会见到 TextData.tmHeight/2 等； 
-        HFONT hFont = CreateFont(44,16,0,0,400,FALSE, FALSE, FALSE,DEFAULT_CHARSET,OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, DEFAULT_QUALITY,FF_DONTCARE, TEXT("微软雅黑"));
-        HFONT ShFont = CreateFont(22,8,0,0,400,FALSE, FALSE, FALSE,DEFAULT_CHARSET,OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, DEFAULT_QUALITY,FF_DONTCARE, TEXT("微软雅黑"));
-        void MainMenu(void)
-        {
-            if(!BlockOne_WriteFile && !BlockTwo_CheckWords)
-            {
-                HDC hdc;
-                hdc = GetDC(Window);
-                GetTextMetrics(hdc,&(TextData));
-                TextData.tmHeight = 44;
-                TextData.tmAveCharWidth = 16;
-                ReleaseDC(Window,hdc);
+                WinData.Window = hwnd;
+                WinData.WindowWidth = GET_X_LPARAM(lParam);
+                WinData.WindowHeight = GET_Y_LPARAM(lParam);
                 
-                BlockOne_WriteFile = CreateWindowEx(0,"STATIC",TEXT("写入文件"),SS_NOTIFY|WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,0,WindowWidth,WindowHeight/2,Window,(HMENU)BlockOneId,0,0);
-                BlockTwo_CheckWords = CreateWindowEx(0,"STATIC",TEXT("单词记忆"),SS_NOTIFY|WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,1*(WindowHeight/2),WindowWidth,WindowHeight/2,Window,(HMENU)BlockTwoId,0,0);
-                SendMessage(BlockOne_WriteFile,WM_SETFONT,(WPARAM)hFont,0);
-                SendMessage(BlockTwo_CheckWords,WM_SETFONT,(WPARAM)hFont,0);     
+                WinData.MainMenu();
             }
+            break;
         }
-    };
+        
+        case WM_CTLCOLORSTATIC:
+        {
+            HBRUSH hBrush;
+            if((HWND)lParam == WinData.BlockOne_WriteFile)
+            {
+                hBrush = CreateSolidBrush(RGB(116,0,0));
+                SetBkColor((HDC)wParam,RGB(116,0,0));
+            }
+            if((HWND)lParam == WinData.BlockTwo_CheckWords)
+            {
+                hBrush = CreateSolidBrush(RGB(199,97,20));
+                SetBkColor((HDC)wParam,RGB(199,97,20));
+            }
+            if((HWND)lParam == WinData.CheckWindow.Word)
+            {
+                hBrush = CreateSolidBrush(RGB(0,255,127));
+                SetBkColor((HDC)wParam,RGB(0,255,127));
+            }
+            if((HWND)lParam == WinData.CheckWindow.ChoiceA)
+            {
+                hBrush = CreateSolidBrush(RGB(255,255,255));
+                SetBkColor((HDC)wParam,RGB(255,255,255));
+            }
+            if((HWND)lParam == WinData.CheckWindow.ChoiceB)
+            {
+                hBrush = CreateSolidBrush(RGB(255,255,255));
+                SetBkColor((HDC)wParam,RGB(255,255,255));
+            }
+            if((HWND)lParam == WinData.CheckWindow.ChoiceC)
+            {
+                hBrush = CreateSolidBrush(RGB(255,255,255));
+                SetBkColor((HDC)wParam,RGB(255,255,255));
+            }
+            if((HWND)lParam == WinData.CheckWindow.ChoiceD)
+            {
+                hBrush = CreateSolidBrush(RGB(255,255,255));
+                SetBkColor((HDC)wParam,RGB(255,255,255));
+            }
+            return (INT_PTR)hBrush;
+        }
+        
+        case WM_COMMAND:
+        {
+            if((HWND)lParam == WinData.BlockOne_WriteFile && HIWORD(wParam) == STN_CLICKED)
+            {
+                DestroyWindow(WinData.BlockOne_WriteFile);
+                DestroyWindow(WinData.BlockTwo_CheckWords);
+                WinData.BlockOne_WriteFile = WinData.BlockTwo_CheckWords = 0;
+                HDC hdc = GetDC(WinData.BlockOne_WriteFile);
+                SetTextColor(hdc,RGB(255,255,255));
+                ReleaseDC(WinData.BlockOne_WriteFile,hdc); 
+                WriteFile();
+            }
+            else if((HWND)lParam == WinData.BlockTwo_CheckWords && HIWORD(wParam) == STN_CLICKED)
+            {
+                DestroyWindow(WinData.BlockOne_WriteFile);
+                DestroyWindow(WinData.BlockTwo_CheckWords);
+                WinData.BlockOne_WriteFile = WinData.BlockTwo_CheckWords = 0;
+                HDC hdc = GetDC(WinData.BlockTwo_CheckWords);
+                SetTextColor(hdc,RGB(255,255,255));
+                ReleaseDC(WinData.BlockOne_WriteFile,hdc);
+                PrepareWords();
+                CheckWords();
+            }
+            else if((HWND)lParam == WinData.WriteWindow.OK)
+            {
+                std::ofstream File;
+                WordsChecking::Word TmpWord;
+                SendMessage(WinData.WriteWindow.Word,WM_GETTEXT,(WPARAM)35,(LPARAM)TmpWord.Word); 
+                SendMessage(WinData.WriteWindow.Meaning,WM_GETTEXT,(WPARAM)35,(LPARAM)TmpWord.Meaning); 
+                SendMessage(WinData.WriteWindow.Part_of_speech,WM_GETTEXT,(WPARAM)10,(LPARAM)TmpWord.Part_of_speech);
+                
+                SendMessage(WinData.WriteWindow.Word,WM_SETTEXT,0,0); 
+                SendMessage(WinData.WriteWindow.Meaning,WM_SETTEXT,0,0); 
+                SendMessage(WinData.WriteWindow.Part_of_speech,WM_SETTEXT,0,0);
+                File.open("SomeTempFile.tmp",std::ios_base::app | std::ios_base::binary);
+                File.write((char*)&TmpWord,sizeof(WordsChecking::Word));
+                File.close();
+                if(MessageBox(hwnd,"是否继续录入单词?","提示",MB_YESNO) == IDNO)
+                {
+                    char WorkName[100];
+                    GetModuleFileName(0,WorkName,100);
+                    char FileName[50] = "NoName";
+                    OPENFILENAME ofn;
+                    memset(&ofn,0,sizeof(ofn));
+                    ofn.lStructSize = sizeof(ofn);
+                    ofn.hwndOwner = WinData.Window;
+                    ofn.lpstrFile = FileName;
+                    ofn.lpstrFile[0] = '\0';
+                    ofn.nMaxFile = sizeof(FileName);
+                    ofn.lpstrFilter = "WordTable Files(*.wsm)\0*.wsm\0All Files(*.*)\0*.*\0\0";
+                    ofn.nFilterIndex = 1;
+                    ofn.lpstrFileTitle = NULL;
+                    ofn.nMaxFileTitle = 0;
+                    ofn.lpstrInitialDir = WorkName;
+                    ofn.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
+                    GetSaveFileName(&ofn);
+                    
+                    rename("SomeTempFile.tmp",FileName);
+                    SetWindowText(WinData.Window,"单词记忆");
+                    //设置标志位，返回主菜单. 
+                    IsMenuDisplay = true;
+                    //摧毁输入控件 
+                    WinData.WriteWindow.DestoryWindows();
+                    WinData.MainMenu(); //再次显示菜单. 
+                }
+            }
+            //TODO:点击ChoiceOK按钮后的事件.
+            else if((HWND)lParam == WinData.CheckWindow.ChoiceOK)
+            {
+                int iValue;
+                switch(WinData.CheckWindow.NowIndex)
+                {
+                    case 1:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceA,BM_GETCHECK,0,0);break;
+                    case 2:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceB,BM_GETCHECK,0,0);break;
+                    case 3:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceC,BM_GETCHECK,0,0);break;
+                    case 4:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceD,BM_GETCHECK,0,0);break;
+                }
+                if(iValue)
+                {
+                    MessageBox(hwnd,"选择正确!","提示",MB_OK|MB_ICONINFORMATION);
+                }
+                else
+                {
+                    MessageBox(hwnd,"选择错误!","提示",MB_OK|MB_ICONWARNING);
+                }
+                WinData.CheckWindow.DestroyWindows();
+                if(WinData.CheckWindow.IsDone())
+                {
+                    MessageBox(hwnd,"测试完毕!","提示",MB_OK|MB_ICONINFORMATION);
+                    WinData.MainMenu();
+                }
+                else
+                {
+                    CheckWords();
+                }
+            }
+            break;
+        }
+		
+		case WM_DESTROY:
+        {
+			PostQuitMessage(0);
+			break;
+		}
+
+		default:
+			return DefWindowProc(hwnd,Message,wParam,lParam);
+	}
+	return 0;
+}
+
+void WriteFile(void)
+{
+    //设置窗口标题 
+    SetWindowText(WinData.Window,"单词录入"); 
+    WinData.WriteWindow.WordIn = CreateWindowEx(0,"STATIC","单词:",WS_VISIBLE|WS_CHILD|SS_LEFT,0,0,WinData.TextData.tmAveCharWidth*6,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.WordInId,0,0);
+    WinData.WriteWindow.MeaningIn = CreateWindowEx(0,"STATIC","单词意义:",WS_VISIBLE|WS_CHILD|SS_LEFT,0,(WinData.TextData.tmHeight+5)*1,WinData.TextData.tmAveCharWidth*10,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.MeaningInId,0,0);
+    WinData.WriteWindow.SpeechIn = CreateWindowEx(0,"STATIC","单词词性:",WS_VISIBLE|WS_CHILD|SS_LEFT,0,(WinData.TextData.tmHeight+5)*2,WinData.TextData.tmAveCharWidth*10,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.SpeechInId,0,0);
+    //隐藏主菜单 
+    IsMenuDisplay = false;
+    WinData.WriteWindow.Word = CreateWindowEx(0,"EDIT","",WS_VISIBLE|WS_CHILD|WS_BORDER|ES_MULTILINE|ES_LEFT,WinData.TextData.tmAveCharWidth*6,0,WinData.TextData.tmAveCharWidth*20,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.WordId,0,0);
+    WinData.WriteWindow.Meaning = CreateWindowEx(0,"EDIT","",WS_VISIBLE|WS_CHILD|WS_BORDER|ES_MULTILINE|ES_LEFT,WinData.TextData.tmAveCharWidth*10,(WinData.TextData.tmHeight+5)*1,WinData.TextData.tmAveCharWidth*20,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.MeaningId,0,0);
+    WinData.WriteWindow.Part_of_speech = CreateWindowEx(0,"EDIT","",WS_VISIBLE|WS_CHILD|WS_BORDER|ES_MULTILINE|ES_LEFT,WinData.TextData.tmAveCharWidth*10,(WinData.TextData.tmHeight+5)*2,WinData.TextData.tmAveCharWidth*20,WinData.TextData.tmHeight+5,WinData.Window,(HMENU)WinData.WriteWindow.Part_of_speechId,0,0);
+    WinData.WriteWindow.OK = CreateWindowEx(0,"BUTTON","录入",WS_VISIBLE|WS_CHILD|BS_PUSHBUTTON,50,(WinData.TextData.tmHeight+5)*3,WinData.TextData.tmAveCharWidth*7,WinData.TextData.tmHeight+8,WinData.Window,(HMENU)WinData.WriteWindow.OKId,0,0);
+    
+    SendMessage(WinData.WriteWindow.WordIn,WM_SETFONT,(WPARAM)WinData.hFont,0);
+    SendMessage(WinData.WriteWindow.MeaningIn,WM_SETFONT,(WPARAM)WinData.hFont,0);
+    SendMessage(WinData.WriteWindow.SpeechIn,WM_SETFONT,(WPARAM)WinData.hFont,0);
+    SendMessage(WinData.WriteWindow.Word,WM_SETFONT,(WPARAM)WinData.hFont,0);
+    SendMessage(WinData.WriteWindow.Meaning,WM_SETFONT,(WPARAM)WinData.hFont,0);
+    SendMessage(WinData.WriteWindow.Part_of_speech,WM_SETFONT,(WPARAM)WinData.hFont,0);
+    SendMessage(WinData.WriteWindow.OK,WM_SETFONT,(WPARAM)WinData.hFont,0);
+    
+    MoveWindow(WinData.Window,680,240,WinData.TextData.tmAveCharWidth*45,(WinData.TextData.tmHeight)*12,true);
+}
+
+void PrepareWords(void)
+{
+    char FileName[50];
+    OPENFILENAME ofn;
+    char WorkName[100];
+    std::fstream File;
+    GetModuleFileName(0,WorkName,100);
+    
+    memset(&ofn,0,sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = WinData.Window;
+    ofn.lpstrFile = FileName;
+    ofn.lpstrFile[0] = '\0';
+    ofn.nMaxFile = sizeof(FileName);
+    ofn.lpstrFilter = "WordTable Files(*.wsm)\0*.wsm\0All Files(*.*)\0*.*\0\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = NULL;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = WorkName;
+    ofn.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
+    GetOpenFileName(&ofn);
+    File.open(FileName,std::ios_base::binary);
+
+    
+    
+    WinData.CheckWindow.MaxNum = WinData.CheckWindow.GetWordNum(FileName);
+    WinData.CheckWindow.WordTable = new WordsChecking::Word[WinData.CheckWindow.MaxNum];
+    ReloadWordsFile(FileName,WinData.CheckWindow.WordTable,WinData.CheckWindow.MaxNum);
+    WinData.CheckWindow.Tested = new bool[WinData.CheckWindow.MaxNum];
+    memset(WinData.CheckWindow.Tested,false,WinData.CheckWindow.MaxNum);
+    //strcpy(WorkFileName,FileName);
+    return;
+}
+
+int ReloadWordsFile(const char* FileName,WordsChecking::Word* BeLoaded,int size)
+{
+    std::ifstream File;
+    File.open(FileName,std::ios_base::binary);
+    for(int i = 0 ;i < size;i++)
+    {
+        File.read((char*)(BeLoaded+i),sizeof(WordsChecking::Word));
+    }
+    File.close();
+    return 0;
+}
+
+void CheckWords(void)
+{
+    srand(time(0));
+    WinData.CheckWindow.Word = CreateWindowEx(0,"STATIC","单词",WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,0,0,0,WinData.Window,(HMENU)WinData.CheckWindow.WordId,0,0);
+    WinData.CheckWindow.Choice = CreateWindowEx(0,"BUTTON","选项",WS_VISIBLE|WS_CHILD|BS_GROUPBOX,0,0,0,0,WinData.Window,(HMENU)WinData.CheckWindow.ChoiceId,0,0);
+    WinData.CheckWindow.ChoiceA = CreateWindowEx(0,"BUTTON","选项A",WS_VISIBLE|WS_CHILD|BS_AUTORADIOBUTTON,0,0,0,0,WinData.CheckWindow.Choice,(HMENU)WinData.CheckWindow.ChoiceAId,0,0);
+    WinData.CheckWindow.ChoiceB = CreateWindowEx(0,"BUTTON","选项B",WS_VISIBLE|WS_CHILD|BS_AUTORADIOBUTTON,0,0,0,0,WinData.CheckWindow.Choice,(HMENU)WinData.CheckWindow.ChoiceBId,0,0);
+    WinData.CheckWindow.ChoiceC = CreateWindowEx(0,"BUTTON","选项C",WS_VISIBLE|WS_CHILD|BS_AUTORADIOBUTTON,0,0,0,0,WinData.CheckWindow.Choice,(HMENU)WinData.CheckWindow.ChoiceCId,0,0);
+    WinData.CheckWindow.ChoiceD = CreateWindowEx(0,"BUTTON","选项D",WS_VISIBLE|WS_CHILD|BS_AUTORADIOBUTTON,0,0,0,0,WinData.CheckWindow.Choice,(HMENU)WinData.CheckWindow.ChoiceDId,0,0);
+    WinData.CheckWindow.ChoiceOK = CreateWindowEx(0,"BUTTON","确认选项",WS_VISIBLE|WS_CHILD|BS_PUSHBUTTON,0,0,0,0,WinData.Window,(HMENU)WinData.CheckWindow.ChoiceDId,0,0);
+    
+    SendMessage(WinData.CheckWindow.Word,WM_SETFONT,(WPARAM)WinData.hFont,0);
+    SendMessage(WinData.CheckWindow.Choice,WM_SETFONT,(WPARAM)WinData.ShFont,0);
+    SendMessage(WinData.CheckWindow.ChoiceA,WM_SETFONT,(WPARAM)WinData.ShFont,0);
+    SendMessage(WinData.CheckWindow.ChoiceB,WM_SETFONT,(WPARAM)WinData.ShFont,0);
+    SendMessage(WinData.CheckWindow.ChoiceC,WM_SETFONT,(WPARAM)WinData.ShFont,0);
+    SendMessage(WinData.CheckWindow.ChoiceD,WM_SETFONT,(WPARAM)WinData.ShFont,0);
+    SendMessage(WinData.CheckWindow.ChoiceOK,WM_SETFONT,(WPARAM)WinData.hFont,0);
+    
+    //隐藏主菜单 
+    IsMenuDisplay = false;
+    
+    HWND Tmp;
+    int index;
+    
+    do
+    {
+        index = rand()%WinData.CheckWindow.MaxNum;
+    }while(WinData.CheckWindow.Tested[index]);
+    
+    WinData.CheckWindow.Tested[index] = true;
+    
+    SetWindowText(WinData.CheckWindow.Word,WinData.CheckWindow.WordTable[index].Word);
+    MoveWindow(WinData.CheckWindow.Word,WinData.WindowWidth/2-(WinData.TextData.tmAveCharWidth*lstrlen(WinData.CheckWindow.WordTable[index].Word)/2),WinData.TextData.tmHeight,WinData.TextData.tmAveCharWidth*(2+lstrlen(WinData.CheckWindow.WordTable[index].Word)),WinData.TextData.tmHeight+15,true);
+    
+    int RightAnswerIndex = WinData.CheckWindow.NowIndex = 1+rand()%4;
+        
+    for(int i = 1;i < 5;i++)
+    {
+        int Fourofindex;//四个选项的index变量 
+        if(RightAnswerIndex == i)
+        {
+            switch(i)
+            {
+                case 1:Tmp = WinData.CheckWindow.ChoiceA;SetWindowText(WinData.CheckWindow.ChoiceA,WinData.CheckWindow.WordTable[index].Meaning);break;
+                case 2:Tmp = WinData.CheckWindow.ChoiceB;SetWindowText(WinData.CheckWindow.ChoiceB,WinData.CheckWindow.WordTable[index].Meaning);break;
+                case 3:Tmp = WinData.CheckWindow.ChoiceC;SetWindowText(WinData.CheckWindow.ChoiceC,WinData.CheckWindow.WordTable[index].Meaning);break;
+                case 4:Tmp = WinData.CheckWindow.ChoiceD;SetWindowText(WinData.CheckWindow.ChoiceD,WinData.CheckWindow.WordTable[index].Meaning);break;
+            }
+            MoveWindow(Tmp,0,i*(WinData.TextData.tmHeight/2),2*lstrlen(WinData.CheckWindow.WordTable[index].Meaning)*(WinData.TextData.tmAveCharWidth/2),WinData.TextData.tmHeight/2,true);
+            continue;
+        }
+            
+        do{
+            Fourofindex = rand()%WinData.CheckWindow.MaxNum;
+        }while(std::string(WinData.CheckWindow.WordTable[Fourofindex].Word) == std::string(WinData.CheckWindow.WordTable[index].Word) || WinData.CheckWindow.Displayed[0] == Fourofindex ||WinData.CheckWindow.Displayed[1] == Fourofindex ||WinData.CheckWindow.Displayed[2] == Fourofindex ||WinData.CheckWindow.Displayed[3] == Fourofindex);
+        
+        WinData.CheckWindow.Displayed[i-1] = Fourofindex;
+        switch(i)
+        {
+            case 1:Tmp = WinData.CheckWindow.ChoiceA;SetWindowText(WinData.CheckWindow.ChoiceA,WinData.CheckWindow.WordTable[Fourofindex].Meaning);break;
+            case 2:Tmp = WinData.CheckWindow.ChoiceB;SetWindowText(WinData.CheckWindow.ChoiceB,WinData.CheckWindow.WordTable[Fourofindex].Meaning);break;
+            case 3:Tmp = WinData.CheckWindow.ChoiceC;SetWindowText(WinData.CheckWindow.ChoiceC,WinData.CheckWindow.WordTable[Fourofindex].Meaning);break;
+            case 4:Tmp = WinData.CheckWindow.ChoiceD;SetWindowText(WinData.CheckWindow.ChoiceD,WinData.CheckWindow.WordTable[Fourofindex].Meaning);break;
+        }
+        MoveWindow(Tmp,0,i*(WinData.TextData.tmHeight/2),2*lstrlen(WinData.CheckWindow.WordTable[Fourofindex].Meaning)*(WinData.TextData.tmAveCharWidth/2),WinData.TextData.tmHeight/2,true);   
+    }
+    MoveWindow(WinData.CheckWindow.ChoiceOK,0,WinData.WindowHeight-WinData.TextData.tmHeight*4/2,WinData.WindowWidth,WinData.TextData.tmHeight+20,true);
+    MoveWindow(WinData.CheckWindow.Choice,0,WinData.WindowHeight/2,WinData.WindowWidth,4*(WinData.TextData.tmHeight/1.5),true);
+    return;
 }
