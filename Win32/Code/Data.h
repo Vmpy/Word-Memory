@@ -67,6 +67,8 @@ namespace WordsChecking
         HWND Word;
         const int WordId = 3005;
         
+        int NowIndex = 0; 
+        
         int GetWordNum(const char* FileName)
         {
             int Num = 0;
@@ -84,6 +86,30 @@ namespace WordsChecking
             }
             File.close();
             return Num;
+        }
+        
+        void DestroyWindows(void)
+        {
+            DestroyWindow(Choice);
+            DestroyWindow(ChoiceA);
+            DestroyWindow(ChoiceB);
+            DestroyWindow(ChoiceC);
+            DestroyWindow(ChoiceD);
+            DestroyWindow(ChoiceOK);
+            DestroyWindow(Word);
+        }
+        
+        bool IsDone(void)
+        {
+            int Count = 0;
+            for(int i = 0;i < MaxNum;i++)
+            {
+                if(Tested[i] != true)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }; 
     
