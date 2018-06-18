@@ -209,6 +209,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                 if(WinData.CheckWindow.IsDone())
                 {
                     MessageBox(hwnd,"测试完毕!","提示",MB_OK|MB_ICONINFORMATION);
+                    delete [] WinData.CheckWindow.WordTable;    //清理内存空间. 
+                    WinData.CheckWindow.WordTable = nullptr;
                     WinData.MainMenu();
                 }
                 else
@@ -369,6 +371,12 @@ void CheckWords(void)
         }
         MoveWindow(Tmp,0,i*(WinData.TextData.tmHeight/2),2*lstrlen(WinData.CheckWindow.WordTable[Fourofindex].Meaning)*(WinData.TextData.tmAveCharWidth/2),WinData.TextData.tmHeight/2,true);   
     }
+
+    //复位显示位. 
+    WinData.CheckWindow.Displayed[0] = -1;
+    WinData.CheckWindow.Displayed[1] = -1;
+    WinData.CheckWindow.Displayed[2] = -1;
+    WinData.CheckWindow.Displayed[3] = -1;
     MoveWindow(WinData.CheckWindow.ChoiceOK,0,WinData.WindowHeight-WinData.TextData.tmHeight*4/2,WinData.WindowWidth,WinData.TextData.tmHeight+20,true);
     MoveWindow(WinData.CheckWindow.Choice,0,WinData.WindowHeight/2,WinData.WindowWidth,4*(WinData.TextData.tmHeight/1.5),true);
     return;
