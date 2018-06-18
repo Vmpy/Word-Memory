@@ -6,9 +6,9 @@ namespace WordsChecking
     class Word
     {
         public:
-        char Word[35];
-        char Meaning[35];
-        char Part_of_speech[10];
+        char Word[35] = {'\0'};
+        char Meaning[35] = {'\0'};
+        char Part_of_speech[10] = {'\0'};
     };
     
     class WriteWindowData
