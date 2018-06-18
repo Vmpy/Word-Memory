@@ -329,9 +329,9 @@ void CheckWords(void)
     
     do
     {
-        index = rand()%WinData.CheckWindow.MaxNum;
+        index = rand()%WinData.CheckWindow.MaxNum; 
     }while(WinData.CheckWindow.Tested[index]);
-    
+
     WinData.CheckWindow.Tested[index] = true;
     
     SetWindowText(WinData.CheckWindow.Word,WinData.CheckWindow.WordTable[index].Word);
