@@ -1,5 +1,8 @@
 #include <windows.h>
 
+
+#define ID_CLOSEEXE 4000
+#define ID_BACKMENU 4001
 //单词类声明. 
 namespace WordsChecking
 {
@@ -32,13 +35,23 @@ namespace WordsChecking
         int Count = 0; 
         void DestoryWindows(void)
         {
-            DestroyWindow(Meaning);
-            DestroyWindow(MeaningIn);
-            DestroyWindow(OK);
-            DestroyWindow(Part_of_speech);
-            DestroyWindow(SpeechIn);
-            DestroyWindow(Word);
-            DestroyWindow(WordIn);
+            if(OK)
+            {
+                DestroyWindow(Meaning);
+                Meaning = 0;
+                DestroyWindow(MeaningIn);
+                MeaningIn = 0;
+                DestroyWindow(OK);
+                OK = 0;
+                DestroyWindow(Part_of_speech);
+                Part_of_speech = 0;
+                DestroyWindow(SpeechIn);
+                SpeechIn = 0;
+                DestroyWindow(Word);
+                Word = 0;
+                DestroyWindow(WordIn);
+                WordIn = 0;
+            }
         }
     };
     
@@ -91,13 +104,23 @@ namespace WordsChecking
         
         void DestroyWindows(void)
         {
-            DestroyWindow(Choice);
-            DestroyWindow(ChoiceA);
-            DestroyWindow(ChoiceB);
-            DestroyWindow(ChoiceC);
-            DestroyWindow(ChoiceD);
-            DestroyWindow(ChoiceOK);
-            DestroyWindow(Word);
+            if(Choice)  //非零时才处理 
+            {
+                DestroyWindow(Choice);
+                Choice = 0; 
+                DestroyWindow(ChoiceA);
+                ChoiceA = 0; 
+                DestroyWindow(ChoiceB);
+                ChoiceB = 0; 
+                DestroyWindow(ChoiceC);
+                ChoiceC = 0; 
+                DestroyWindow(ChoiceD);
+                ChoiceD = 0; 
+                DestroyWindow(ChoiceOK);
+                ChoiceOK = 0;
+                DestroyWindow(Word);
+                Word = 0;
+            }
         }
         
         bool IsDone(void)
@@ -117,6 +140,8 @@ namespace WordsChecking
     class WorkWindowData
     {
         public:
+            
+        HMENU hMainMenu; 
         
         HWND Window = 0;
         unsigned int WindowHeight = 0;
