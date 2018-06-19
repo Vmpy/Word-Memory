@@ -1,6 +1,5 @@
 #include <windows.h>
 
-
 #define ID_CLOSEEXE 4000
 #define ID_BACKMENU 4001
 //单词类声明. 
