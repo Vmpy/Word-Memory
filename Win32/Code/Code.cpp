@@ -167,39 +167,48 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                 File.open("SomeTempFile.tmp",std::ios_base::app | std::ios_base::binary);
                 File.write((char*)&TmpWord,sizeof(WordsChecking::Word));
                 File.close();
+                WinData.WriteWindow.Count++;
                 if(MessageBox(hwnd,"是否继续录入单词?","提示",MB_YESNO) == IDNO)
                 {
-                    char WorkName[100];
-                    GetModuleFileName(0,WorkName,100);
-                    char FileName[50] = "NoName";
-                    OPENFILENAME ofn;
-                    memset(&ofn,0,sizeof(ofn));
-                    ofn.lStructSize = sizeof(ofn);
-                    ofn.hwndOwner = WinData.Window;
-                    ofn.lpstrFile = FileName;
-                    ofn.lpstrFile[0] = '\0';
-                    ofn.nMaxFile = sizeof(FileName);
-                    ofn.lpstrFilter = "WordTable Files(*.wsm)\0*.wsm\0All Files(*.*)\0*.*\0\0";
-                    ofn.nFilterIndex = 1;
-                    ofn.lpstrFileTitle = NULL;
-                    ofn.nMaxFileTitle = 0;
-                    ofn.lpstrInitialDir = WorkName;
-                    ofn.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
-                    if(GetSaveFileName(&ofn))
+                    if(WinData.WriteWindow.Count < 4)
                     {
-                        rename("SomeTempFile.tmp",FileName);
-                        SetWindowText(WinData.Window,"单词记忆");
+                        MessageBox(hwnd,"已录入的单词词条数量太少,请继续录入.","提示",MB_ICONWARNING);
                     }
                     else
                     {
-                        remove("SomeTempFile.tmp");
+                        char WorkName[100];
+                        GetModuleFileName(0,WorkName,100);
+                        char FileName[50] = "NoName";
+                        OPENFILENAME ofn;
+                        memset(&ofn,0,sizeof(ofn));
+                        ofn.lStructSize = sizeof(ofn);
+                        ofn.hwndOwner = WinData.Window;
+                        ofn.lpstrFile = FileName;
+                        ofn.lpstrFile[0] = '\0';
+                        ofn.nMaxFile = sizeof(FileName);
+                        ofn.lpstrFilter = "WordTable Files(*.wsm)\0*.wsm\0All Files(*.*)\0*.*\0\0";
+                        ofn.nFilterIndex = 1;
+                        ofn.lpstrFileTitle = NULL;
+                        ofn.nMaxFileTitle = 0;
+                        ofn.lpstrInitialDir = WorkName;
+                        ofn.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
+                        if(GetSaveFileName(&ofn))
+                        {
+                            rename("SomeTempFile.tmp",FileName);
+                            SetWindowText(WinData.Window,"单词记忆");
+                        }
+                        else
+                        {
+                            remove("SomeTempFile.tmp");
+                        }
+                        
+                        //设置标志位，返回主菜单. 
+                        IsMenuDisplay = true;
+                        //摧毁输入控件 
+                        WinData.WriteWindow.Count = 0;
+                        WinData.WriteWindow.DestoryWindows();
+                        WinData.MainMenu(); //再次显示菜单. 
                     }
-                    
-                    //设置标志位，返回主菜单. 
-                    IsMenuDisplay = true;
-                    //摧毁输入控件 
-                    WinData.WriteWindow.DestoryWindows();
-                    WinData.MainMenu(); //再次显示菜单. 
                 }
             }
             else if((HWND)lParam == WinData.CheckWindow.ChoiceOK)
