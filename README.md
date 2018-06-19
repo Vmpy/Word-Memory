@@ -5,16 +5,16 @@
 # 文件注意事项
  `Ms-Dos`和`Win32`是两个单独的文件.请分别编译.
 # 文件结构
-  Ms-Dos
-  |
-  |____Code
-       |
-       |____Code.cpp
+  Ms-Dos<br>
+  |<br>
+  |____Code<br>
+       |<br>
+       |____Code.cpp<br><br>
    
-  Win32
-  |
-  |____Code
-       |
-       |____Code.cpp
-       |
-       |____Data.h
+  Win32<br>
+  |<br>
+  |____Code<br>
+       |<br>
+       |____Code.cpp<br>
+       |<br>
+       |____Data.h<br><br>
