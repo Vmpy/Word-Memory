@@ -272,8 +272,6 @@ void WriteFile(void)
     SendMessage(WinData.WriteWindow.Meaning,WM_SETFONT,(WPARAM)WinData.hFont,0);
     SendMessage(WinData.WriteWindow.Part_of_speech,WM_SETFONT,(WPARAM)WinData.hFont,0);
     SendMessage(WinData.WriteWindow.OK,WM_SETFONT,(WPARAM)WinData.hFont,0);
-    
-    MoveWindow(WinData.Window,680,240,WinData.TextData.tmAveCharWidth*45,(WinData.TextData.tmHeight)*12,true);
 }
 
 /**
