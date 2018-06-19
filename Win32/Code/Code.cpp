@@ -34,7 +34,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 	wc.lpszClassName = "WordMemory";
 	wc.hIcon = LoadIcon(NULL,IDI_APPLICATION);
 	wc.hIconSm = LoadIcon(NULL,IDI_APPLICATION);
-
+    
 	if(!RegisterClassEx(&wc))
     {
 		MessageBox(NULL, "Window Registration Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
@@ -69,6 +69,15 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
 {
 	switch(Message)
     {
+        case WM_CREATE:
+        {
+            WinData.hMainMenu = CreateMenu();
+            AppendMenu(WinData.hMainMenu,MF_STRING,ID_BACKMENU,TEXT("返回主菜单"));
+            AppendMenu(WinData.hMainMenu,MF_STRING,ID_CLOSEEXE,TEXT("关闭程序"));
+            SetMenu(hwnd,WinData.hMainMenu);
+            break;
+        }
+        
         case WM_SIZE:
         {
             if(IsMenuDisplay)
@@ -125,121 +134,140 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
         
         case WM_COMMAND:
         {
-            if((HWND)lParam == WinData.BlockOne_WriteFile && HIWORD(wParam) == STN_CLICKED)
+            if(lParam)  //子窗口控件. 
             {
-                DestroyWindow(WinData.BlockOne_WriteFile);
-                DestroyWindow(WinData.BlockTwo_CheckWords);
-                WinData.BlockOne_WriteFile = WinData.BlockTwo_CheckWords = 0;
-                HDC hdc = GetDC(WinData.BlockOne_WriteFile);
-                SetTextColor(hdc,RGB(255,255,255));
-                ReleaseDC(WinData.BlockOne_WriteFile,hdc); 
-                WriteFile();
-            }
-            else if((HWND)lParam == WinData.BlockTwo_CheckWords && HIWORD(wParam) == STN_CLICKED)
-            {
-                DestroyWindow(WinData.BlockOne_WriteFile);
-                DestroyWindow(WinData.BlockTwo_CheckWords);
-                WinData.BlockOne_WriteFile = WinData.BlockTwo_CheckWords = 0;
-                HDC hdc = GetDC(WinData.BlockTwo_CheckWords);
-                SetTextColor(hdc,RGB(255,255,255));
-                ReleaseDC(WinData.BlockOne_WriteFile,hdc);
-                PrepareWords();
-                if(WinData.CheckWindow.MaxNum)
+                if((HWND)lParam == WinData.BlockOne_WriteFile && HIWORD(wParam) == STN_CLICKED)
                 {
-                    CheckWords();
+                    DestroyWindow(WinData.BlockOne_WriteFile);
+                    DestroyWindow(WinData.BlockTwo_CheckWords);
+                    WinData.BlockOne_WriteFile = WinData.BlockTwo_CheckWords = 0;
+                    
+                    HDC hdc = GetDC(WinData.BlockOne_WriteFile);
+                    SetTextColor(hdc,RGB(255,255,255));
+                    ReleaseDC(WinData.BlockOne_WriteFile,hdc); 
+                    WriteFile();
                 }
-                else
+                else if((HWND)lParam == WinData.BlockTwo_CheckWords && HIWORD(wParam) == STN_CLICKED)
                 {
-                    WinData.MainMenu();
-                }
-            }
-            else if((HWND)lParam == WinData.WriteWindow.OK)
-            {
-                std::ofstream File;
-                WordsChecking::Word TmpWord;
-                SendMessage(WinData.WriteWindow.Word,WM_GETTEXT,(WPARAM)35,(LPARAM)TmpWord.Word); 
-                SendMessage(WinData.WriteWindow.Meaning,WM_GETTEXT,(WPARAM)35,(LPARAM)TmpWord.Meaning); 
-                SendMessage(WinData.WriteWindow.Part_of_speech,WM_GETTEXT,(WPARAM)10,(LPARAM)TmpWord.Part_of_speech);
-                
-                SendMessage(WinData.WriteWindow.Word,WM_SETTEXT,0,0); 
-                SendMessage(WinData.WriteWindow.Meaning,WM_SETTEXT,0,0); 
-                SendMessage(WinData.WriteWindow.Part_of_speech,WM_SETTEXT,0,0);
-                File.open("SomeTempFile.tmp",std::ios_base::app | std::ios_base::binary);
-                File.write((char*)&TmpWord,sizeof(WordsChecking::Word));
-                File.close();
-                WinData.WriteWindow.Count++;
-                if(MessageBox(hwnd,"是否继续录入单词?","提示",MB_YESNO) == IDNO)
-                {
-                    if(WinData.WriteWindow.Count < 4)
+                    DestroyWindow(WinData.BlockOne_WriteFile);
+                    DestroyWindow(WinData.BlockTwo_CheckWords);
+                    WinData.BlockOne_WriteFile = WinData.BlockTwo_CheckWords = 0;
+                    
+                    HDC hdc = GetDC(WinData.BlockTwo_CheckWords);
+                    SetTextColor(hdc,RGB(255,255,255));
+                    ReleaseDC(WinData.BlockOne_WriteFile,hdc);
+                    PrepareWords();
+                    if(WinData.CheckWindow.MaxNum)
                     {
-                        MessageBox(hwnd,"已录入的单词词条数量太少,请继续录入.","提示",MB_ICONWARNING);
+                        CheckWords();
                     }
                     else
                     {
-                        char WorkName[100];
-                        GetModuleFileName(0,WorkName,100);
-                        char FileName[50] = "NoName";
-                        OPENFILENAME ofn;
-                        memset(&ofn,0,sizeof(ofn));
-                        ofn.lStructSize = sizeof(ofn);
-                        ofn.hwndOwner = WinData.Window;
-                        ofn.lpstrFile = FileName;
-                        ofn.lpstrFile[0] = '\0';
-                        ofn.nMaxFile = sizeof(FileName);
-                        ofn.lpstrFilter = "WordTable Files(*.wsm)\0*.wsm\0All Files(*.*)\0*.*\0\0";
-                        ofn.nFilterIndex = 1;
-                        ofn.lpstrFileTitle = NULL;
-                        ofn.nMaxFileTitle = 0;
-                        ofn.lpstrInitialDir = WorkName;
-                        ofn.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
-                        if(GetSaveFileName(&ofn))
+                        WinData.MainMenu();
+                    }
+                }
+                else if((HWND)lParam == WinData.WriteWindow.OK)
+                {
+                    std::ofstream File;
+                    WordsChecking::Word TmpWord;
+                    SendMessage(WinData.WriteWindow.Word,WM_GETTEXT,(WPARAM)35,(LPARAM)TmpWord.Word); 
+                    SendMessage(WinData.WriteWindow.Meaning,WM_GETTEXT,(WPARAM)35,(LPARAM)TmpWord.Meaning); 
+                    SendMessage(WinData.WriteWindow.Part_of_speech,WM_GETTEXT,(WPARAM)10,(LPARAM)TmpWord.Part_of_speech);
+                    
+                    SendMessage(WinData.WriteWindow.Word,WM_SETTEXT,0,0); 
+                    SendMessage(WinData.WriteWindow.Meaning,WM_SETTEXT,0,0); 
+                    SendMessage(WinData.WriteWindow.Part_of_speech,WM_SETTEXT,0,0);
+                    File.open("SomeTempFile.tmp",std::ios_base::app | std::ios_base::binary);
+                    File.write((char*)&TmpWord,sizeof(WordsChecking::Word));
+                    File.close();
+                    WinData.WriteWindow.Count++;
+                    if(MessageBox(hwnd,"是否继续录入单词?","提示",MB_YESNO) == IDNO)
+                    {
+                        if(WinData.WriteWindow.Count < 4)
                         {
-                            rename("SomeTempFile.tmp",FileName);
-                            SetWindowText(WinData.Window,"单词记忆");
+                            MessageBox(hwnd,"已录入的单词词条数量太少,请继续录入.","提示",MB_ICONWARNING);
                         }
                         else
                         {
-                            remove("SomeTempFile.tmp");
+                            char WorkName[100];
+                            GetModuleFileName(0,WorkName,100);
+                            char FileName[50] = "NoName";
+                            OPENFILENAME ofn;
+                            memset(&ofn,0,sizeof(ofn));
+                            ofn.lStructSize = sizeof(ofn);
+                            ofn.hwndOwner = WinData.Window;
+                            ofn.lpstrFile = FileName;
+                            ofn.lpstrFile[0] = '\0';
+                            ofn.nMaxFile = sizeof(FileName);
+                            ofn.lpstrFilter = "WordTable Files(*.wsm)\0*.wsm\0All Files(*.*)\0*.*\0\0";
+                            ofn.nFilterIndex = 1;
+                            ofn.lpstrFileTitle = NULL;
+                            ofn.nMaxFileTitle = 0;
+                            ofn.lpstrInitialDir = WorkName;
+                            ofn.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
+                            if(GetSaveFileName(&ofn))
+                            {
+                                rename("SomeTempFile.tmp",FileName);
+                                SetWindowText(WinData.Window,"单词记忆");
+                            }
+                            else
+                            {
+                                remove("SomeTempFile.tmp");
+                            }
+                            
+                            //设置标志位，返回主菜单. 
+                            IsMenuDisplay = true;
+                            //摧毁输入控件 
+                            WinData.WriteWindow.Count = 0;
+                            WinData.WriteWindow.DestoryWindows();
+                            WinData.MainMenu(); //再次显示菜单. 
                         }
-                        
-                        //设置标志位，返回主菜单. 
-                        IsMenuDisplay = true;
-                        //摧毁输入控件 
-                        WinData.WriteWindow.Count = 0;
-                        WinData.WriteWindow.DestoryWindows();
-                        WinData.MainMenu(); //再次显示菜单. 
+                    }
+                }
+                else if((HWND)lParam == WinData.CheckWindow.ChoiceOK)
+                {
+                    int iValue;
+                    switch(WinData.CheckWindow.NowIndex)
+                    {
+                        case 1:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceA,BM_GETCHECK,0,0);break;
+                        case 2:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceB,BM_GETCHECK,0,0);break;
+                        case 3:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceC,BM_GETCHECK,0,0);break;
+                        case 4:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceD,BM_GETCHECK,0,0);break;
+                    }
+                    if(iValue)
+                    {
+                        MessageBox(hwnd,"选择正确!","提示",MB_OK|MB_ICONINFORMATION);
+                    }
+                    else
+                    {
+                        MessageBox(hwnd,"选择错误!","提示",MB_OK|MB_ICONWARNING);
+                    }
+                    WinData.CheckWindow.DestroyWindows();
+                    if(WinData.CheckWindow.IsDone())
+                    {
+                        MessageBox(hwnd,"测试完毕!","提示",MB_OK|MB_ICONINFORMATION);
+                        delete [] WinData.CheckWindow.WordTable;    //清理内存空间. 
+                        WinData.CheckWindow.WordTable = nullptr;
+                        WinData.MainMenu();
+                    }
+                    else
+                    {
+                        CheckWords();
                     }
                 }
             }
-            else if((HWND)lParam == WinData.CheckWindow.ChoiceOK)
+            else    //lParam为0时，处理菜单. 
             {
-                int iValue;
-                switch(WinData.CheckWindow.NowIndex)
+                switch(LOWORD(wParam))
                 {
-                    case 1:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceA,BM_GETCHECK,0,0);break;
-                    case 2:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceB,BM_GETCHECK,0,0);break;
-                    case 3:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceC,BM_GETCHECK,0,0);break;
-                    case 4:iValue = (int)SendMessage(WinData.CheckWindow.ChoiceD,BM_GETCHECK,0,0);break;
-                }
-                if(iValue)
-                {
-                    MessageBox(hwnd,"选择正确!","提示",MB_OK|MB_ICONINFORMATION);
-                }
-                else
-                {
-                    MessageBox(hwnd,"选择错误!","提示",MB_OK|MB_ICONWARNING);
-                }
-                WinData.CheckWindow.DestroyWindows();
-                if(WinData.CheckWindow.IsDone())
-                {
-                    MessageBox(hwnd,"测试完毕!","提示",MB_OK|MB_ICONINFORMATION);
-                    delete [] WinData.CheckWindow.WordTable;    //清理内存空间. 
-                    WinData.CheckWindow.WordTable = nullptr;
-                    WinData.MainMenu();
-                }
-                else
-                {
-                    CheckWords();
+                    case ID_CLOSEEXE:DestroyWindow(hwnd);break;
+                    case ID_BACKMENU:
+                    {
+                        WinData.WriteWindow.DestoryWindows();
+                        WinData.CheckWindow.DestroyWindows();
+                        WinData.MainMenu();
+                        break;
+                    }
                 }
             }
             break;
