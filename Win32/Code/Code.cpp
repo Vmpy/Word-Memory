@@ -30,7 +30,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 	wc.hInstance = hInstance;
 	wc.hCursor = LoadCursor(NULL,IDC_ARROW);
 	
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wc.hbrBackground = CreateSolidBrush(RGB(173,216,230));
 	wc.lpszClassName = "WordMemory";
 	wc.hIcon = LoadIcon(NULL,IDI_APPLICATION);
 	wc.hIconSm = LoadIcon(NULL,IDI_APPLICATION);
