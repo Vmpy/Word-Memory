@@ -173,7 +173,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                     SendMessage(WinData.WriteWindow.Word,WM_GETTEXT,(WPARAM)35,(LPARAM)TmpWord.Word); 
                     SendMessage(WinData.WriteWindow.Meaning,WM_GETTEXT,(WPARAM)35,(LPARAM)TmpWord.Meaning); 
                     SendMessage(WinData.WriteWindow.Part_of_speech,WM_GETTEXT,(WPARAM)10,(LPARAM)TmpWord.Part_of_speech);
-                    
+                    if(std::string(TmpWord.Word) == "" || std::string(TmpWord.Meaning) == "" || std::string(TmpWord.Part_of_speech) == "")
+                    {
+                        MessageBox(hwnd,"单词输入有误，请重新输入.","提示",MB_OK|MB_ICONERROR);
+                        break;
+                    } 
                     SendMessage(WinData.WriteWindow.Word,WM_SETTEXT,0,0); 
                     SendMessage(WinData.WriteWindow.Meaning,WM_SETTEXT,0,0); 
                     SendMessage(WinData.WriteWindow.Part_of_speech,WM_SETTEXT,0,0);
@@ -356,7 +360,6 @@ void PrepareWords(void)
     ReloadWordsFile(FileName,WinData.CheckWindow.WordTable,WinData.CheckWindow.MaxNum);
     WinData.CheckWindow.Tested = new bool[WinData.CheckWindow.MaxNum];
     memset(WinData.CheckWindow.Tested,false,WinData.CheckWindow.MaxNum);
-    //strcpy(WorkFileName,FileName);
     return;
 }
 
