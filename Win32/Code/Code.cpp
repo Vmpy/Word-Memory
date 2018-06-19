@@ -73,6 +73,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
             WinData.hMainMenu = CreateMenu();
             AppendMenu(WinData.hMainMenu,MF_STRING,ID_BACKMENU,TEXT("返回主菜单"));
             AppendMenu(WinData.hMainMenu,MF_STRING,ID_CLOSEEXE,TEXT("关闭程序"));
+            AppendMenu(WinData.hMainMenu,MF_STRING,ID_ABOUT,TEXT("关于"));
             SetMenu(hwnd,WinData.hMainMenu);
             break;
         }
@@ -267,6 +268,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                         WinData.MainMenu();
                         break;
                     }
+                    case ID_ABOUT:
+                    {
+                        MessageBox(WinData.Window,"  单词记忆程序,用于写入单词文件和检测记忆.\n\t\t\t----By Vmpy","About",MB_OK|MB_ICONINFORMATION);
+                        break; 
+                    } 
                 }
             }
             break;
