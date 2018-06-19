@@ -29,6 +29,7 @@ namespace WordsChecking
         HWND OK = 0;
         const int OKId = 1111;
         
+        int Count = 0; 
         void DestoryWindows(void)
         {
             DestroyWindow(Meaning);
