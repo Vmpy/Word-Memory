@@ -62,6 +62,9 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 	return msg.wParam;
 }
 
+/**
+*主回调函数. 
+*/
 LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
 {
 	switch(Message)
@@ -141,7 +144,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                 SetTextColor(hdc,RGB(255,255,255));
                 ReleaseDC(WinData.BlockOne_WriteFile,hdc);
                 PrepareWords();
-                CheckWords();
+                if(WinData.CheckWindow.MaxNum)
+                {
+                    CheckWords();
+                }
+                else
+                {
+                    WinData.MainMenu();
+                }
             }
             else if((HWND)lParam == WinData.WriteWindow.OK)
             {
@@ -175,10 +185,16 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                     ofn.nMaxFileTitle = 0;
                     ofn.lpstrInitialDir = WorkName;
                     ofn.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
-                    GetSaveFileName(&ofn);
+                    if(GetSaveFileName(&ofn))
+                    {
+                        rename("SomeTempFile.tmp",FileName);
+                        SetWindowText(WinData.Window,"单词记忆");
+                    }
+                    else
+                    {
+                        remove("SomeTempFile.tmp");
+                    }
                     
-                    rename("SomeTempFile.tmp",FileName);
-                    SetWindowText(WinData.Window,"单词记忆");
                     //设置标志位，返回主菜单. 
                     IsMenuDisplay = true;
                     //摧毁输入控件 
@@ -186,7 +202,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                     WinData.MainMenu(); //再次显示菜单. 
                 }
             }
-            //TODO:点击ChoiceOK按钮后的事件.
             else if((HWND)lParam == WinData.CheckWindow.ChoiceOK)
             {
                 int iValue;
@@ -233,6 +248,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
+/**
+*写入单词界面绘制. 
+*/
 void WriteFile(void)
 {
     //设置窗口标题 
@@ -258,6 +276,9 @@ void WriteFile(void)
     MoveWindow(WinData.Window,680,240,WinData.TextData.tmAveCharWidth*45,(WinData.TextData.tmHeight)*12,true);
 }
 
+/**
+*装填准备WinData.CheckWindow.XXX信息的函数. 
+*/
 void PrepareWords(void)
 {
     char FileName[50];
@@ -278,11 +299,18 @@ void PrepareWords(void)
     ofn.nMaxFileTitle = 0;
     ofn.lpstrInitialDir = WorkName;
     ofn.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
-    GetOpenFileName(&ofn);
-    File.open(FileName,std::ios_base::binary);
+    
+    if(GetOpenFileName(&ofn))
+    {
+        File.open(FileName,std::ios_base::binary);
+    }
+    else
+    {
+        WinData.CheckWindow.MaxNum = 0;
+        WinData.CheckWindow.WordTable = nullptr;
+        return;
+    }
 
-    
-    
     WinData.CheckWindow.MaxNum = WinData.CheckWindow.GetWordNum(FileName);
     WinData.CheckWindow.WordTable = new WordsChecking::Word[WinData.CheckWindow.MaxNum];
     ReloadWordsFile(FileName,WinData.CheckWindow.WordTable,WinData.CheckWindow.MaxNum);
@@ -292,6 +320,9 @@ void PrepareWords(void)
     return;
 }
 
+/**
+*装填内存空间，有指针指向. 
+*/
 int ReloadWordsFile(const char* FileName,WordsChecking::Word* BeLoaded,int size)
 {
     std::ifstream File;
@@ -304,6 +335,9 @@ int ReloadWordsFile(const char* FileName,WordsChecking::Word* BeLoaded,int size)
     return 0;
 }
 
+/**
+*测试单词界面绘制. 
+*/
 void CheckWords(void)
 {
     srand(time(0));
