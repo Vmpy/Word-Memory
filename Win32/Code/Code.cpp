@@ -5,7 +5,6 @@
 #include <ctime> 
 #include "Data.h" 
 
-
 WordsChecking::WorkWindowData WinData;
 
 bool IsMenuDisplay = true;
@@ -20,46 +19,46 @@ void PrepareWords(void);
  
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow)
 {
-	WNDCLASSEX wc;
-	MSG msg;
+    WNDCLASSEX wc;
+    MSG msg;
 
-	memset(&wc,0,sizeof(wc));
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.lpfnWndProc = WndProc;
-	wc.hInstance = hInstance;
-	wc.hCursor = LoadCursor(NULL,IDC_ARROW);
-	
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-	wc.lpszClassName = "WordMemory";
-	wc.hIcon = LoadIcon(NULL,IDI_APPLICATION);
-	wc.hIconSm = LoadIcon(NULL,IDI_APPLICATION);
+    memset(&wc,0,sizeof(wc));
+    wc.style = CS_HREDRAW | CS_VREDRAW;
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.lpfnWndProc = WndProc;
+    wc.hInstance = hInstance;
+    wc.hCursor = LoadCursor(NULL,IDC_ARROW);
     
-	if(!RegisterClassEx(&wc))
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+    wc.lpszClassName = "WordMemory";
+    wc.hIcon = LoadIcon(NULL,IDI_APPLICATION);
+    wc.hIconSm = LoadIcon(NULL,IDI_APPLICATION);
+    
+    if(!RegisterClassEx(&wc))
     {
-		MessageBox(NULL, "Window Registration Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
-		return 0;
-	}
+        MessageBox(NULL, "Window Registration Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
+        return 0;
+    }
 
-	WinData.Window = CreateWindowEx(WS_EX_CLIENTEDGE,"WordMemory",WinData.Caption,WS_VISIBLE|WS_OVERLAPPEDWINDOW^WS_THICKFRAME^WS_MAXIMIZEBOX,
+    WinData.Window = CreateWindowEx(WS_EX_CLIENTEDGE,"WordMemory",WinData.Caption,WS_VISIBLE|WS_OVERLAPPEDWINDOW^WS_THICKFRAME^WS_MAXIMIZEBOX,
         CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		640,
-		480,
-		NULL,NULL,hInstance,NULL);
+        CW_USEDEFAULT,
+        640,
+        480,
+        NULL,NULL,hInstance,NULL);
 
-	if(WinData.Window == NULL)
+    if(WinData.Window == NULL)
     {
-		MessageBox(NULL,"Window Creation Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
-		return 0;
-	}
+        MessageBox(NULL,"Window Creation Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
+        return 0;
+    }
 
-	while(GetMessage(&msg,NULL,0,0))
+    while(GetMessage(&msg,NULL,0,0))
     {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-	return msg.wParam;
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    return msg.wParam;
 }
 
 /**
@@ -67,7 +66,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 */
 LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
 {
-	switch(Message)
+    switch(Message)
     {
         case WM_CREATE:
         {
@@ -272,17 +271,17 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
             }
             break;
         }
-		
-		case WM_DESTROY:
+        
+        case WM_DESTROY:
         {
-			PostQuitMessage(0);
-			break;
-		}
+            PostQuitMessage(0);
+            break;
+        }
 
-		default:
-			return DefWindowProc(hwnd,Message,wParam,lParam);
-	}
-	return 0;
+        default:
+            return DefWindowProc(hwnd,Message,wParam,lParam);
+    }
+    return 0;
 }
 
 /**
