@@ -401,8 +401,10 @@ void CheckWords(void)
     WinData.CheckWindow.ChoiceC = CreateWindowEx(0,"BUTTON","选项C",WS_VISIBLE|WS_CHILD|BS_AUTORADIOBUTTON,0,0,0,0,WinData.CheckWindow.Choice,(HMENU)WinData.CheckWindow.ChoiceCId,0,0);
     WinData.CheckWindow.ChoiceD = CreateWindowEx(0,"BUTTON","选项D",WS_VISIBLE|WS_CHILD|BS_AUTORADIOBUTTON,0,0,0,0,WinData.CheckWindow.Choice,(HMENU)WinData.CheckWindow.ChoiceDId,0,0);
     WinData.CheckWindow.ChoiceOK = CreateWindowEx(0,"BUTTON","确认选项",WS_VISIBLE|WS_CHILD|BS_PUSHBUTTON,0,0,0,0,WinData.Window,(HMENU)WinData.CheckWindow.ChoiceDId,0,0);
+    WinData.CheckWindow.Speech = CreateWindowEx(0,"STATIC","词性",WS_VISIBLE|WS_CHILD|SS_CENTER|SS_CENTERIMAGE,0,0,0,0,WinData.Window,(HMENU)WinData.CheckWindow.SpeechId,0,0);
     
     SendMessage(WinData.CheckWindow.Word,WM_SETFONT,(WPARAM)WinData.hFont,0);
+    SendMessage(WinData.CheckWindow.Speech,WM_SETFONT,(WPARAM)WinData.hFont,0);
     SendMessage(WinData.CheckWindow.Choice,WM_SETFONT,(WPARAM)WinData.ShFont,0);
     SendMessage(WinData.CheckWindow.ChoiceA,WM_SETFONT,(WPARAM)WinData.ShFont,0);
     SendMessage(WinData.CheckWindow.ChoiceB,WM_SETFONT,(WPARAM)WinData.ShFont,0);
@@ -426,6 +428,8 @@ void CheckWords(void)
     
     SetWindowText(WinData.CheckWindow.Word,WinData.CheckWindow.WordTable[index].Word);
     MoveWindow(WinData.CheckWindow.Word,WinData.WindowWidth/2-(WinData.TextData.tmAveCharWidth*lstrlen(WinData.CheckWindow.WordTable[index].Word)/2),WinData.TextData.tmHeight,WinData.TextData.tmAveCharWidth*(2+lstrlen(WinData.CheckWindow.WordTable[index].Word)),WinData.TextData.tmHeight+15,true);
+    SetWindowText(WinData.CheckWindow.Speech,WinData.CheckWindow.WordTable[index].Part_of_speech);
+    MoveWindow(WinData.CheckWindow.Speech,WinData.WindowWidth/2-(WinData.TextData.tmAveCharWidth*lstrlen(WinData.CheckWindow.WordTable[index].Word)/2)+WinData.TextData.tmAveCharWidth*(2+lstrlen(WinData.CheckWindow.WordTable[index].Word))+1,WinData.TextData.tmHeight,WinData.TextData.tmHeight/2+WinData.TextData.tmAveCharWidth*(2+lstrlen(WinData.CheckWindow.WordTable[index].Part_of_speech)),WinData.TextData.tmHeight+15,true);
     
     int RightAnswerIndex = WinData.CheckWindow.NowIndex = 1+rand()%4;
     
