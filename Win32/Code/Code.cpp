@@ -40,7 +40,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
         return 0;
     }
 
-    WinData.Window = CreateWindowEx(WS_EX_CLIENTEDGE,"WordMemory",WinData.Caption,WS_VISIBLE|WS_OVERLAPPEDWINDOW^WS_THICKFRAME^WS_MAXIMIZEBOX,
+    WinData.Window = CreateWindowEx(WS_EX_CLIENTEDGE,"WordMemory","",WS_VISIBLE|WS_OVERLAPPEDWINDOW^WS_THICKFRAME^WS_MAXIMIZEBOX,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
         640,
@@ -241,19 +241,25 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                     if(iValue)
                     {
                         MessageBox(hwnd,"选择正确!","提示",MB_OK|MB_ICONINFORMATION);
+                        WinData.CheckWindow.AnalyseData.RightNum++;
                     }
                     else
                     {
                         std::string Message = std::string("选择错误!\n正确答案:") + std::string(WinData.CheckWindow.WordTable[WinData.CheckWindow.RightAnswerIndex].Meaning);
                         MessageBox(hwnd,Message.c_str(),"提示",MB_OK|MB_ICONWARNING);
-                        
+                        WinData.CheckWindow.AnalyseData.WrongNum++;
                     }
+                    
                     WinData.CheckWindow.DestroyWindows();
+                    
                     if(WinData.CheckWindow.IsDone())
                     {
-                        MessageBox(hwnd,"测试完毕!","提示",MB_OK|MB_ICONINFORMATION);
+                        WinData.CheckWindow.AnalyseData.Accuracy = (float)WinData.CheckWindow.AnalyseData.RightNum/WinData.CheckWindow.AnalyseData.All;
+                        std::string Message = std::string("测试完毕!\n") + std::string("正确率:") + std::to_string(WinData.CheckWindow.AnalyseData.Accuracy*100) + std::string("%");
+                        MessageBox(hwnd,Message.c_str(),"提示",MB_OK|MB_ICONINFORMATION);
                         delete [] WinData.CheckWindow.WordTable;    //清理内存空间. 
                         WinData.CheckWindow.WordTable = nullptr;
+                        WinData.CheckWindow.AnalyseData.Destorys();
                         WinData.MainMenu();
                     }
                     else
@@ -420,6 +426,8 @@ void CheckWords(void)
     MoveWindow(WinData.CheckWindow.Word,WinData.WindowWidth/2-(WinData.TextData.tmAveCharWidth*lstrlen(WinData.CheckWindow.WordTable[index].Word)/2),WinData.TextData.tmHeight,WinData.TextData.tmAveCharWidth*(2+lstrlen(WinData.CheckWindow.WordTable[index].Word)),WinData.TextData.tmHeight+15,true);
     
     int RightAnswerIndex = WinData.CheckWindow.NowIndex = 1+rand()%4;
+    
+    WinData.CheckWindow.AnalyseData.All = WinData.CheckWindow.MaxNum;
         
     for(int i = 1;i < 5;i++)
     {
@@ -451,7 +459,10 @@ void CheckWords(void)
         }
         MoveWindow(Tmp,0,i*(WinData.TextData.tmHeight/2),2*lstrlen(WinData.CheckWindow.WordTable[Fourofindex].Meaning)*(WinData.TextData.tmAveCharWidth/2),WinData.TextData.tmHeight/2,true);   
     }
-
+    
+    std::string Caption = std::string("单词记忆 ") + std::string("单词总数:") + std::to_string(WinData.CheckWindow.AnalyseData.All) + std::string(" 剩余:") + std::to_string(WinData.CheckWindow.AnalyseData.All-(WinData.CheckWindow.AnalyseData.RightNum+WinData.CheckWindow.AnalyseData.WrongNum));
+    SetWindowText(WinData.Window,Caption.c_str());
+    
     //复位显示位. 
     WinData.CheckWindow.Displayed[0] = -1;
     WinData.CheckWindow.Displayed[1] = -1;
