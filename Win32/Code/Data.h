@@ -4,6 +4,9 @@
 #define ID_BACKMENU 4001
 #define ID_ABOUT 4002 
 
+const COLORREF WriteFileRGB = RGB(0,255,255);
+const COLORREF CheckFileRGB = RGB(0,191,255);
+
 //单词类声明. 
 namespace WordsChecking
 {
