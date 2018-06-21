@@ -56,6 +56,20 @@ namespace WordsChecking
         }
     };
     
+    class Analyse
+    {
+        public:
+        int All = 0;
+        int WrongNum = 0;
+        int RightNum = 0;
+        float Accuracy = 0.0;
+        
+        void Destorys(void)
+        {
+            All = WrongNum = RightNum = Accuracy = 0.0;
+        }
+    };
+    
     class CheckWordsData
     {
         public:
@@ -85,6 +99,7 @@ namespace WordsChecking
         int NowIndex = 0;
         
         int RightAnswerIndex = -1;
+        Analyse AnalyseData;
         
         int GetWordNum(const char* FileName)
         {
@@ -140,7 +155,7 @@ namespace WordsChecking
             }
             return true;
         }
-    }; 
+    };
     
     class WorkWindowData
     {
@@ -151,7 +166,6 @@ namespace WordsChecking
         HWND Window = 0;
         unsigned int WindowHeight = 0;
         unsigned int WindowWidth = 0;
-        char Caption[15] = "单词记忆";
         
         HWND WordText = 0;
         unsigned int WordTextPosx = 0;
@@ -169,6 +183,7 @@ namespace WordsChecking
         //这里的小字体=大字体长宽/2，所以在代码中会见到 TextData.tmHeight/2 等； 
         HFONT hFont = CreateFont(44,16,0,0,400,FALSE, FALSE, FALSE,DEFAULT_CHARSET,OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, DEFAULT_QUALITY,FF_DONTCARE, TEXT("微软雅黑"));
         HFONT ShFont = CreateFont(22,8,0,0,400,FALSE, FALSE, FALSE,DEFAULT_CHARSET,OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, DEFAULT_QUALITY,FF_DONTCARE, TEXT("微软雅黑"));
+        
         void MainMenu(void)
         {
             if(!BlockOne_WriteFile && !BlockTwo_CheckWords)
@@ -185,6 +200,7 @@ namespace WordsChecking
                 SendMessage(BlockOne_WriteFile,WM_SETFONT,(WPARAM)hFont,0);
                 SendMessage(BlockTwo_CheckWords,WM_SETFONT,(WPARAM)hFont,0);     
             }
+            SetWindowText(Window,"单词记忆程序主菜单");
         }
     };
 }
