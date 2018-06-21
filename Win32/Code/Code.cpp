@@ -254,8 +254,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                     
                     if(WinData.CheckWindow.IsDone())
                     {
-                        WinData.CheckWindow.AnalyseData.Accuracy = (float)WinData.CheckWindow.AnalyseData.RightNum/WinData.CheckWindow.AnalyseData.All;
-                        std::string Message = std::string("测试完毕!\n") + std::string("正确率:") + std::to_string(WinData.CheckWindow.AnalyseData.Accuracy*100) + std::string("%");
+                        WinData.CheckWindow.AnalyseData.Accuracy = 100*((float)WinData.CheckWindow.AnalyseData.RightNum/WinData.CheckWindow.AnalyseData.All);
+                        std::string Message = std::string("测试完毕!\n") + std::string("正确率:") + std::to_string(WinData.CheckWindow.AnalyseData.Accuracy) + std::string("%");
                         MessageBox(hwnd,Message.c_str(),"提示",MB_OK|MB_ICONINFORMATION);
                         delete [] WinData.CheckWindow.WordTable;    //清理内存空间. 
                         WinData.CheckWindow.WordTable = nullptr;
