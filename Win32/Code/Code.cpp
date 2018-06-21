@@ -209,9 +209,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                             ofn.nMaxFileTitle = 0;
                             ofn.lpstrInitialDir = WorkName;
                             ofn.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
+                            
                             if(GetSaveFileName(&ofn))
                             {
-                                rename("SomeTempFile.tmp",FileName);
+                                std::string FileNameS = std::string(FileName) + std::string(".wsm");
+                                rename("SomeTempFile.tmp",FileNameS.c_str());
                                 SetWindowText(WinData.Window,"单词记忆");
                             }
                             else
