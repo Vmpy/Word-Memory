@@ -2,6 +2,8 @@
 
 #define ID_CLOSEEXE 4000
 #define ID_BACKMENU 4001
+#define ID_ABOUT 4002 
+
 //单词类声明. 
 namespace WordsChecking
 {
@@ -80,7 +82,9 @@ namespace WordsChecking
         HWND Word;
         const int WordId = 3005;
         
-        int NowIndex = 0; 
+        int NowIndex = 0;
+        
+        int RightAnswerIndex = -1;
         
         int GetWordNum(const char* FileName)
         {
@@ -119,6 +123,8 @@ namespace WordsChecking
                 ChoiceOK = 0;
                 DestroyWindow(Word);
                 Word = 0;
+                RightAnswerIndex = -1;
+                NowIndex = 0;
             }
         }
         
