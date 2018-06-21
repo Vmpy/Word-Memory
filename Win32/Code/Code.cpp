@@ -96,13 +96,13 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
             HBRUSH hBrush;
             if((HWND)lParam == WinData.BlockOne_WriteFile)
             {
-                hBrush = CreateSolidBrush(RGB(116,0,0));
-                SetBkColor((HDC)wParam,RGB(116,0,0));
+                hBrush = CreateSolidBrush(WriteFileRGB);
+                SetBkColor((HDC)wParam,WriteFileRGB);
             }
             if((HWND)lParam == WinData.BlockTwo_CheckWords)
             {
-                hBrush = CreateSolidBrush(RGB(199,97,20));
-                SetBkColor((HDC)wParam,RGB(199,97,20));
+                hBrush = CreateSolidBrush(CheckFileRGB);
+                SetBkColor((HDC)wParam,CheckFileRGB);
             }
             if((HWND)lParam == WinData.CheckWindow.Word)
             {
