@@ -62,11 +62,11 @@ namespace WordsChecking
         int All = 0;
         int WrongNum = 0;
         int RightNum = 0;
-        float Accuracy = 0.0;
+        int Accuracy = 0;
         
         void Destorys(void)
         {
-            All = WrongNum = RightNum = Accuracy = 0.0;
+            All = WrongNum = RightNum = Accuracy = 0;
         }
     };
     
