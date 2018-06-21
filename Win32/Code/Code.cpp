@@ -244,7 +244,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT Message,WPARAM wParam,LPARAM lParam)
                     }
                     else
                     {
-                        MessageBox(hwnd,"选择错误!","提示",MB_OK|MB_ICONWARNING);
+                        std::string Message = std::string("选择错误!\n正确答案:") + std::string(WinData.CheckWindow.WordTable[WinData.CheckWindow.RightAnswerIndex].Meaning);
+                        MessageBox(hwnd,Message.c_str(),"提示",MB_OK|MB_ICONWARNING);
+                        
                     }
                     WinData.CheckWindow.DestroyWindows();
                     if(WinData.CheckWindow.IsDone())
@@ -411,6 +413,7 @@ void CheckWords(void)
         index = rand()%WinData.CheckWindow.MaxNum; 
     }while(WinData.CheckWindow.Tested[index]);
 
+    WinData.CheckWindow.RightAnswerIndex = index;
     WinData.CheckWindow.Tested[index] = true;
     
     SetWindowText(WinData.CheckWindow.Word,WinData.CheckWindow.WordTable[index].Word);
