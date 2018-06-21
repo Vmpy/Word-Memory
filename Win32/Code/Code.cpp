@@ -441,7 +441,7 @@ void CheckWords(void)
                 case 3:Tmp = WinData.CheckWindow.ChoiceC;SetWindowText(WinData.CheckWindow.ChoiceC,WinData.CheckWindow.WordTable[index].Meaning);break;
                 case 4:Tmp = WinData.CheckWindow.ChoiceD;SetWindowText(WinData.CheckWindow.ChoiceD,WinData.CheckWindow.WordTable[index].Meaning);break;
             }
-            MoveWindow(Tmp,0,i*(WinData.TextData.tmHeight/2),3*lstrlen(WinData.CheckWindow.WordTable[index].Meaning)*(WinData.TextData.tmAveCharWidth/2),WinData.TextData.tmHeight/2,true);
+            MoveWindow(Tmp,0,i*(WinData.TextData.tmHeight/2),WinData.WindowWidth,WinData.TextData.tmHeight/2,true);
             continue;
         }
             
@@ -457,7 +457,7 @@ void CheckWords(void)
             case 3:Tmp = WinData.CheckWindow.ChoiceC;SetWindowText(WinData.CheckWindow.ChoiceC,WinData.CheckWindow.WordTable[Fourofindex].Meaning);break;
             case 4:Tmp = WinData.CheckWindow.ChoiceD;SetWindowText(WinData.CheckWindow.ChoiceD,WinData.CheckWindow.WordTable[Fourofindex].Meaning);break;
         }
-        MoveWindow(Tmp,0,i*(WinData.TextData.tmHeight/2),3*lstrlen(WinData.CheckWindow.WordTable[Fourofindex].Meaning)*(WinData.TextData.tmAveCharWidth/2),WinData.TextData.tmHeight/2,true);   
+        MoveWindow(Tmp,0,i*(WinData.TextData.tmHeight/2),WinData.WindowWidth,WinData.TextData.tmHeight/2,true);   
     }
     
     std::string Caption = std::string("单词记忆 ") + std::string("单词总数:") + std::to_string(WinData.CheckWindow.AnalyseData.All) + std::string(" 剩余:") + std::to_string(WinData.CheckWindow.AnalyseData.All-(WinData.CheckWindow.AnalyseData.RightNum+WinData.CheckWindow.AnalyseData.WrongNum));
