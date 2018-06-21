@@ -97,7 +97,10 @@ namespace WordsChecking
         const int ChoiceOKId = 3005;
         //Static 
         HWND Word;
-        const int WordId = 3005;
+        const int WordId = 3006;
+        
+        HWND Speech; 
+        const int SpeechId = 3007;
         
         int NowIndex = 0;
         
