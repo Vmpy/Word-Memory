@@ -59,6 +59,7 @@ namespace WordsChecking
         }
     };
     
+    /*分析数据*/
     class Analyse
     {
         public:
@@ -149,6 +150,7 @@ namespace WordsChecking
             }
         }
         
+        /*判断是否测试完毕*/
         bool IsDone(void)
         {
             int Count = 0;
@@ -163,6 +165,7 @@ namespace WordsChecking
         }
     };
     
+    /*主菜单界面数据*/
     class WorkWindowData
     {
         public:
