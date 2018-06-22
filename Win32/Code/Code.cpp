@@ -352,14 +352,15 @@ void PrepareWords(void)
     ofn.lpstrFileTitle = NULL;
     ofn.nMaxFileTitle = 0;
     ofn.lpstrInitialDir = WorkName;
-    ofn.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
+    ofn.Flags = OFN_OVERWRITEPROMPT;
     
     if(GetOpenFileName(&ofn))
     {
         File.open(FileName,std::ios_base::binary);
     }
     else
-    {
+    {   
+        //打开失败后的处理 
         WinData.CheckWindow.MaxNum = 0;
         WinData.CheckWindow.WordTable = nullptr;
         return;
@@ -440,6 +441,7 @@ void CheckWords(void)
         int Fourofindex;//四个选项的index变量 
         if(RightAnswerIndex == i)
         {
+            //为正确的选项装填字符串 
             switch(i)
             {
                 case 1:Tmp = WinData.CheckWindow.ChoiceA;SetWindowText(WinData.CheckWindow.ChoiceA,WinData.CheckWindow.WordTable[index].Meaning);break;
